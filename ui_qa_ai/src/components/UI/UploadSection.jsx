@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-
+import './styleui/UploadSection.css'
 const UploadSection = ({ onFileSelect }) => {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);

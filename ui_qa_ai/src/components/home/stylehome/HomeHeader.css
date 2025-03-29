@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-text {
+    font-size: 30px;
+    font-weight: 700;
+    color: white;
+    border: 2px solid white;
+    padding: 5px 15px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .logo-question {
+    color: orange;
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 4px;
+    transform: rotate(15deg);
+  }
+  
+  .nav ul {
+    display: flex;
+    list-style: none;
+    align-items: center;
+  }
+  
+  .nav ul li {
+    margin-left: 30px;
+    position: relative;
+  }
+  
+  .nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .nav ul li a:hover {
+    color: #00ddeb;
+  }
+  
+  .nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: #00ddeb;
+    bottom: -5px;
+    left: 0;
+    transition: width 0.3s ease;
+  }
+  
+  .nav ul li a:hover::after {
+    width: 100%;
+  }
+  
+  .dropdown {
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  
+  .login-btn {
+    border: 2px solid white;
+    padding: 8px 20px;
+    border-radius: 2px;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .login-btn:hover {
+    background: white;
+    color: #1a2a44;
+  }
+  

@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './styleui/ResultSection.css'
 const ResultSection = ({ results }) => {
   if (!results) {
     return (

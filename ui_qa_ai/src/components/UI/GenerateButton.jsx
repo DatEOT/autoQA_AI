@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './styleui/GenerateButton.css'
 const GenerateButton = ({ onClick, loading }) => {
   return (
     <button onClick={onClick} disabled={loading}>

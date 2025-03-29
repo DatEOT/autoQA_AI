@@ -7,6 +7,7 @@ import ApiKeyInput from './ApiKeyInput';
 import BloomLevels from './BloomLevels';
 import GenerateButton from './GenerateButton';
 import ResultSection from './ResultSection';
+import './styleui/Dashboard.css';
 
 const Dashboard = () => {
   const [totalQuestions, setTotalQuestions] = useState(10);
@@ -16,46 +17,24 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [bloomSum, setBloomSum] = useState(0);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login'; // hoặc dùng navigate('/login') nếu bạn đang dùng useNavigate()
+  };
+
   const handleGenerateQuestions = async () => {
     if (!file) {
-      toast.error('Vui lòng chọn file trước khi tạo câu hỏi.', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.error('Vui lòng chọn file trước khi tạo câu hỏi.', { position: 'top-right', autoClose: 3000 });
       return;
     }
 
     if (!apiKey) {
-      toast.error('Vui lòng nhập API Key.', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.error('Vui lòng nhập API Key.', { position: 'top-right', autoClose: 3000 });
       return;
     }
 
     if (bloomSum !== totalQuestions) {
-      toast.error(`Tổng số câu hỏi Bloom (${bloomSum}) không khớp với số lượng câu hỏi yêu cầu (${totalQuestions}).`, {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.error(`Tổng số câu hỏi Bloom (${bloomSum}) không khớp với số lượng câu hỏi yêu cầu (${totalQuestions}).`, { position: 'top-right', autoClose: 3000 });
       return;
     }
 
@@ -74,8 +53,6 @@ const Dashboard = () => {
 
     try {
       const trimmedApiKey = apiKey.trim();
-      console.log('Sending API Key:', trimmedApiKey);
-
       const response = await axios.post(
         'http://127.0.0.1:8000/questions/generate',
         formData,
@@ -89,16 +66,7 @@ const Dashboard = () => {
       );
 
       setResults(response.data);
-      toast.success('Tạo câu hỏi thành công!', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.success('Tạo câu hỏi thành công!', { position: 'top-right', autoClose: 3000 });
     } catch (err) {
       let errorMessage = err.response?.data?.detail || err.message || 'Đã xảy ra lỗi khi tạo câu hỏi.';
       const levelsNotSupported = [];
@@ -112,16 +80,7 @@ const Dashboard = () => {
         errorMessage = `Không thể tạo cấp độ ${levelsNotSupported.join(', ')} do văn bản quá ít.`;
       }
 
-      toast.error(errorMessage, {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
+      toast.error(errorMessage, { position: 'top-right', autoClose: 3000 });
     } finally {
       setLoading(false);
     }
@@ -129,6 +88,12 @@ const Dashboard = () => {
 
   return (
     <div className="container">
+      <div className="dashboard-header">
+        <button className="logout-button" onClick={handleLogout}>
+          <i className="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+
       <h1>Tạo Câu Hỏi Tự Luận từ File DOCX, PDF, TXT</h1>
       <UploadSection onFileSelect={setFile} />
       <TotalQuestions totalQuestions={totalQuestions} setTotalQuestions={setTotalQuestions} />

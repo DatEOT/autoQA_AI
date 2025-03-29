@@ -1,0 +1,122 @@
+.footer {
+    background-color: #073c52;
+    color: #fff;
+    padding: 60px 40px;
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+  
+  .footer-left {
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
+  }
+  
+  .logo-box {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid white;
+    padding: 8px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+  }
+  
+  .logo-question {
+    color: #ff6200;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 4px;
+    transform: rotate(15deg);
+  }
+  
+  
+  .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  
+  .social-icons a {
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+  
+  .social-icons a:hover {
+    background: white;
+    color: #073c52;
+  }
+  
+  .footer-email {
+    color: white;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .footer-right {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .footer-right h3 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .footer-right p {
+    font-size: 14px;
+    color: #eee;
+    margin-bottom: 16px;
+  }
+  
+  .footer-right input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+  }
+  
+  .checkbox {
+    font-size: 13px;
+    color: #ddd;
+    margin-bottom: 20px;
+  }
+  
+  .checkbox a {
+    color: #65bdf0;
+    text-decoration: underline;
+  }
+  
+  .submit-btn {
+    background-color: #f47c2c;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #e36718;
+  }
+  

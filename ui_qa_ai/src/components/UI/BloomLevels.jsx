@@ -1,6 +1,6 @@
 // src/components/UI/BloomLevels.jsx
 import React, { useEffect, useState } from 'react';
-
+import './styleui/BloomLevels.css'
 const BloomLevels = ({ totalQuestions, onSumChange }) => {
   const [levels, setLevels] = useState({
     level_1: 0,

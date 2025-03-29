@@ -2,13 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/login/Login';
 import Register from './components/login/Register';
-import Navbar from './components/login/Navbar';
 import Dashboard from './components/UI/Dashboard';
 import './styles.css';
-import './auth.css';
-import './ui.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import HomeDashboard from './page/HomeDashboard';
 
 
 const App = () => {
@@ -27,11 +25,12 @@ const App = () => {
           pauseOnHover // Tạm dừng khi di chuột qua
           theme="light" // Chủ đề sáng (có thể đổi thành "dark")
         />
-        <Navbar />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/homedashboard" element={<HomeDashboard />} />
+
           <Route path="/" element={<Login />} />
         </Routes>
       </div>

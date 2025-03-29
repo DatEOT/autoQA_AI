@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import lockIcon from '../../assets/images/lock-icon.png';
 import userIcon from '../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
-
+import './styleauth/Login.css'
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

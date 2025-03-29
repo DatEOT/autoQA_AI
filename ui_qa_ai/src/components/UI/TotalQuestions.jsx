@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './styleui/TotalQuestions.css'
 const TotalQuestions = ({ totalQuestions, setTotalQuestions }) => {
   return (
     <div className="total-questions">

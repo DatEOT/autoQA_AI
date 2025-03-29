@@ -1,16 +1,7 @@
-/* src/styles/auth.css */
+/* Register.css */
 
-/* CSS chung cho trang đăng nhập/đăng ký */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .login-page {
-    background: url('./assets/images/background.jpg') no-repeat center center fixed;
+.login-page {
+    background: url('../../assets/images/background.jpg') no-repeat center center fixed;
     background-size: cover;
     height: 100vh;
     display: flex;
@@ -40,10 +31,22 @@ body {
     padding: 20px;
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.6s ease;
   }
   
-  .auth-container h1 {
-    font-size: 24px;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .auth-container h2 {
+    font-size: 20px;
     margin-bottom: 20px;
     text-align: center;
   }
@@ -67,6 +70,12 @@ body {
     color: white;
     font-size: 16px;
     outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    box-shadow: 0 0 5px #00ddeb;
+    border-left-color: #00ddeb;
   }
   
   .form-group input::placeholder {
@@ -81,24 +90,6 @@ body {
     opacity: 0.7;
   }
   
-  .form-options {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .show-password {
-    display: flex;
-    align-items: center;
-    color: white;
-    font-size: 14px;
-  }
-  
-  .show-password input {
-    margin-right: 5px;
-  }
-  
   .auth-container button {
     width: 100%;
     padding: 12px;
@@ -109,11 +100,12 @@ body {
     font-weight: bold;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   
   .auth-container button:hover {
     background-color: #555;
+    transform: translateY(-1px);
   }
   
   .error {
@@ -138,3 +130,4 @@ body {
   .register-link a:hover {
     text-decoration: underline;
   }
+  
