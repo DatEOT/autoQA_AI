@@ -1,0 +1,53 @@
+# Thư mục môi trường ảo (virtual environment)
+myproject_env/
+
+# Bỏ qua các file byte-compiled của Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Bỏ qua các file/phân phối đóng gói
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Bỏ qua các file log, coverage, cache
+*.log
+*.coverage
+.coverage.*
+.cache
+pytest_cache/
+coverage/
+.tox/
+
+# Bỏ qua các file .env (chứa biến môi trường, API keys)
+.env
+.env.*
+
+# Bỏ qua thư mục, file checkpoint của Jupyter Notebook
+.ipynb_checkpoints/
+
+# Bỏ qua cache của các công cụ phân tích/kiểm tra kiểu
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Bỏ qua các file/thư mục cấu hình IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Bỏ qua file tạm của macOS
+.DS_Store
+
+# Docker-specific
+*.pid
+
+# Bỏ qua các thư mục/directory tạm tùy chỉnh (nếu không cần đẩy)
+# (nếu /docker/ hoặc /download/ là phần code quan trọng, hãy xóa dòng dưới)
+/download/*
+/docker/
+# /utils*  (nếu bạn không muốn bỏ qua utils, hãy xóa dòng này)
