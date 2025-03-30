@@ -19,7 +19,7 @@ const DashboardAdmin = () => {
 
   return (
     <div className="dashboard-admin">
-      <h2>Welcome to Admin Dashboard</h2>
+      <h2>Admin Dashboard</h2>
       <div className="card-container">
         <div className="card user" onClick={() => navigate('/admin/users/user')}>
           <h3>Total Users</h3>

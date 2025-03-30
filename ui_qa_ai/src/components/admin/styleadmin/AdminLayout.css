@@ -1,93 +1,145 @@
 .admin-container {
-    display: flex;
-    height: 100vh;
-    background-color: #f4f6f8;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .admin-sidebar {
-    width: 240px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .admin-sidebar .logo {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-    letter-spacing: 1px;
-  }
-  
-  .admin-sidebar nav ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .admin-sidebar nav ul li {
-    margin-bottom: 16px;
-  }
-  
-  .admin-sidebar nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 10px 12px;
-    display: block;
-    border-radius: 6px;
-    transition: background 0.3s ease;
-  }
-  
-  .admin-sidebar nav ul li a:hover,
-  .admin-sidebar nav ul li a.active {
-    background-color: #34495e;
-  }
-  
-  .admin-main {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .admin-header {
-    background-color: #ffffff;
-    padding: 16px 24px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-  
-  .logout-btn {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .logout-btn i {
-    font-size: 14px;
-  }
-  
-  .logout-btn:hover {
-    background: linear-gradient(135deg, #c0392b, #a93226);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.25);
-  }
-  
-  .admin-content {
-    flex-grow: 1;
-    padding: 30px;
-    overflow-y: auto;
-  }
-  
+  display: flex;
+  height: 100vh;
+  background-color: #f4f7fa;
+  font-family: 'Poppins', sans-serif; /* Giữ font Poppins */
+}
+
+.admin-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #1a1a1a, #2c2c2c); /* Màu đen với gradient nhẹ */
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2); /* Bóng mạnh hơn để nổi bật */
+  border-right: 1px solid #333; /* Viền phải nhẹ */
+}
+
+.admin-sidebar .logo {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  text-align: left;
+  letter-spacing: 1px;
+  color: #ffffff; /* Màu trắng cho logo */
+}
+
+.admin-sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-sidebar nav ul li {
+  margin-bottom: 10px;
+}
+
+.admin-sidebar nav ul li a,
+.admin-sidebar .menu-parent {
+  color: #b0b0b0; /* Màu xám nhạt cho chữ */
+  text-decoration: none;
+  font-size: 15px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.admin-sidebar nav ul li a:hover,
+.admin-sidebar nav ul li a.active,
+.admin-sidebar .menu-parent:hover {
+  background-color: #3a3a3a; /* Màu xám đậm khi hover */
+  color: #4e73df; /* Màu xanh lam nhạt khi hover/active */
+  transform: translateX(5px); /* Hiệu ứng dịch chuyển nhẹ */
+}
+
+.menu-icon {
+  margin-right: 12px;
+  font-size: 18px;
+  color: #b0b0b0; /* Màu biểu tượng đồng bộ với chữ */
+  transition: color 0.3s ease;
+}
+
+.admin-sidebar nav ul li a:hover .menu-icon,
+.admin-sidebar nav ul li a.active .menu-icon,
+.admin-sidebar .menu-parent:hover .menu-icon {
+  color: #4e73df; /* Biểu tượng đổi màu khi hover/active */
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 30px;
+  margin-top: 5px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.submenu li {
+  margin-bottom: 8px;
+}
+
+.submenu li a {
+  color: #b0b0b0;
+  font-size: 14px;
+  padding: 8px 15px;
+}
+
+.submenu li a:hover {
+  background-color: #3a3a3a;
+  color: #4e73df;
+}
+
+.submenu-icon {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #b0b0b0;
+}
+
+.submenu li a:hover .submenu-icon {
+  color: #4e73df;
+}
+
+/* Admin Main */
+.admin-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-header {
+  background-color: #fff;
+  padding: 15px 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ff5c5c, #f03e3e);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #f03e3e, #d93636);
+  transform: translateY(-2px);
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+/* Animation */

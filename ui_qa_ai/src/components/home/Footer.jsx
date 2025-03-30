@@ -7,7 +7,7 @@ function Footer() {
       <div className="footer-container">
         <div className="footer-left">
         <div className="logo-box">
-            QA application<span className="logo-question">?</span>
+            QnA application<span className="logo-question">?</span>
         </div>
 
           <div className="social-icons">
@@ -16,11 +16,11 @@ function Footer() {
             <a href="facebook"><i className="fab fa-facebook-f"></i></a>
             <a href="youtube"><i className="fab fa-youtube"></i></a>
           </div>
-          <p className="footer-email">info@qa.com</p>
+          <p className="footer-email">info@qna.com</p>
         </div>
         <div className="footer-right">
           <h3>Stay in Touch</h3>
-          <p>Subscribe to our newsletter to get the latest news and updates on QA.</p>
+          <p>Subscribe to our newsletter to get the latest news and updates on QnA.</p>
           <input type="email" placeholder="Enter your email address" />
           <div className="checkbox">
             <input type="checkbox" id="agree" />

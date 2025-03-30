@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback  } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -7,13 +7,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import './styleadmin/UserList.css';
 
 const UserList = () => {
+  const [searchEmail, setSearchEmail] = useState('');
   const { role } = useParams();
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ email: '', password: '', role: 'user' });
   const [editingId, setEditingId] = useState(null);
 
   const fetchUsers = useCallback(() => {
-    axios.get("http://127.0.0.1:8000/users/getUsers")
+    axios.get("http://127.0.0.1:8000/Usermanagement/getUsers")
       .then(res => {
         let data = res.data;
         if (role) {
@@ -23,7 +24,7 @@ const UserList = () => {
       })
       .catch(err => console.error("Error loading users:", err));
   }, [role]);
-  
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
@@ -34,8 +35,7 @@ const UserList = () => {
 
   const handleSubmit = () => {
     if (editingId) {
-      // Update role only
-      axios.put(`http://127.0.0.1:8000/users/updateUser/${editingId}?role=${form.role}`)
+      axios.put(`http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`)
         .then(() => {
           toast.success("User updated successfully!");
           setEditingId(null);
@@ -47,8 +47,7 @@ const UserList = () => {
           toast.error("Failed to update user.");
         });
     } else {
-      // Create new user
-      axios.post("http://127.0.0.1:8000/users/createUser", form)
+      axios.post("http://127.0.0.1:8000/Usermanagement/createUser", form)
         .then(() => {
           toast.success("User created successfully!");
           setForm({ email: '', password: '', role: 'user' });
@@ -78,7 +77,7 @@ const UserList = () => {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://127.0.0.1:8000/users/delete/${id}`)
+        axios.delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`)
           .then(() => {
             toast.success("User deleted successfully!");
             fetchUsers();
@@ -91,9 +90,82 @@ const UserList = () => {
     });
   };
 
+  const handleSearch = () => {
+    if (searchEmail.trim() === '') {
+      fetchUsers();
+    } else {
+      const encodedEmail = encodeURIComponent(searchEmail);
+      axios.get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`)
+        .then(res => {
+          setUsers([res.data]);
+        })
+        .catch(() => {
+          toast.error("Không tìm thấy email!");
+          setUsers([]);
+        });
+    }
+  };
+
+  const toggleActive = (id, currentStatus) => {
+    axios.put(`http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`)
+      .then(() => {
+        toast.success(`User has been ${!currentStatus ? 'unlocked' : 'locked'} successfully!`);
+        fetchUsers();
+      })
+      .catch(() => {
+        toast.error("Failed to update user status!");
+      });
+  };
+
+  const handleUpdateBalance = (id, action) => {
+    Swal.fire({
+      title: `${action === "add" ? "Cộng" : "Trừ"} tiền cho user`,
+      input: "number",
+      inputLabel: "Nhập số tiền",
+      inputAttributes: {
+        min: 0.01,
+        step: 0.01,
+      },
+      inputValidator: (value) => {
+        if (!value || isNaN(value)) {
+          return "Vui lòng nhập số hợp lệ";
+        }
+      },
+      showCancelButton: true,
+      confirmButtonText: "Xác nhận",
+      cancelButtonText: "Hủy",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const amount = parseFloat(result.value);
+        const finalAmount = action === "add" ? amount : -amount;
+
+        axios
+          .put(`http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`)
+          .then(() => {
+            toast.success(`${action === "add" ? "Cộng" : "Trừ"} tiền thành công!`);
+            fetchUsers();
+          })
+          .catch((err) => {
+            toast.error("Lỗi cập nhật số dư");
+            console.error("Balance error:", err);
+          });
+      }
+    });
+  };
+
   return (
     <div className="user-list">
       <h2>User Management</h2>
+
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search by email..."
+          value={searchEmail}
+          onChange={(e) => setSearchEmail(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
 
       <div className="form-section">
         <input
@@ -115,10 +187,12 @@ const UserList = () => {
           />
         )}
 
-        <select name="role" value={form.role} onChange={handleChange}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
+        {editingId && (
+          <select name="role" value={form.role} onChange={handleChange}>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        )}
 
         <button onClick={handleSubmit}>
           {editingId ? "Update" : "Create"}
@@ -128,7 +202,7 @@ const UserList = () => {
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Email</th><th>Role</th><th>Actions</th>
+            <th>ID</th><th>Email</th><th>Role</th><th>Active</th><th>Balance</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -137,9 +211,16 @@ const UserList = () => {
               <td>{user.id}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
+              <td>{user.is_active ? '✅' : '❌'}</td>
+              <td>${parseFloat(user.balance).toFixed(2)}</td>
               <td>
                 <button onClick={() => handleEdit(user)}>Edit</button>
-                <button onClick={() => handleDelete(user.id)}>Delete</button>
+                <button className="delete-btn" onClick={() => handleDelete(user.id)}>Delete</button>
+                <button className="lock-btn" onClick={() => toggleActive(user.id, user.is_active)}>
+                  {user.is_active ? "Lock" : "Unlock"}
+                </button>
+                <button className="balance-btn add-balance" onClick={() => handleUpdateBalance(user.id, "add")}>+ $</button>
+                <button className="balance-btn sub-balance" onClick={() => handleUpdateBalance(user.id, "subtract")}>− $</button>
               </td>
             </tr>
           ))}

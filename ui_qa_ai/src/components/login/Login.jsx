@@ -19,8 +19,10 @@ const Login = () => {
         email,
         password,
       });
-      const { access_token } = response.data;
+      const { access_token, role } = response.data;
       localStorage.setItem('token', access_token);
+      localStorage.setItem('role', role); // lưu lại nếu cần
+
       toast.success('Đăng nhập thành công!', {
         position: 'top-right',
         autoClose: 3000,
@@ -31,9 +33,19 @@ const Login = () => {
         progress: undefined,
         theme: 'light',
       });
-      navigate('/dashboard');
+
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+
     } catch (err) {
-      setError('Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
+      if (err.response?.data?.detail === "Tài khoản đã bị khóa") {
+        setError("Tài khoản của bạn đã bị khóa.");
+      } else {
+        setError("Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.");
+      }      
       toast.error('Đăng nhập thất bại!', {
         position: 'top-right',
         autoClose: 3000,

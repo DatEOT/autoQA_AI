@@ -6,7 +6,7 @@ function HomeHeader() {
   return (
     <header className="header">
       <div className="logo">
-        <span className="logo-text">Ứng Dụng QA</span>
+        <span className="logo-text">QnA App</span>
         <span className="logo-question">?</span>
       </div>
       <nav className="nav">
