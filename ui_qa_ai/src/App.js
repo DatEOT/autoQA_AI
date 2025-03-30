@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import HomeDashboard from './page/HomeDashboard';
 import AdminLayout from './components/admin/AdminLayout';
 import UserList from './components/admin/UserList';
-
+import DashboardAdmin from './components/admin/DashboardAdmin';
 const App = () => {
   return (
     <Router>
@@ -36,8 +36,9 @@ const App = () => {
 
           {/* ADMIN NESTED ROUTES */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<div>Welcome to Admin Dashboard</div>} />
+            <Route path="dashboardadmin" element={<DashboardAdmin />} />
             <Route path="users" element={<UserList />} />
+            <Route path="users/:role" element={<UserList />} />
             <Route path="settings" element={<div>Settings content</div>} />
           </Route>
         </Routes>

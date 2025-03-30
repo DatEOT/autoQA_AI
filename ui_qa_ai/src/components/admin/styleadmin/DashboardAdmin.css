@@ -1,0 +1,53 @@
+.dashboard-admin {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .dashboard-admin h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 40px;
+  }
+  
+  .card-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    width: 220px;
+    padding: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+  }
+  
+  .card span {
+    font-size: 32px;
+    font-weight: bold;
+  }
+  
+  .card.user span {
+    color: #3498db;
+  }
+  
+  .card.admin span {
+    color: #e74c3c;
+  }
+  

@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback  } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
+import 'react-toastify/dist/ReactToastify.css';
 import './styleadmin/UserList.css';
 
 const UserList = () => {
+  const { role } = useParams();
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ email: '', password: '', role: 'user' });
   const [editingId, setEditingId] = useState(null);
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     axios.get("http://127.0.0.1:8000/users/getUsers")
-      .then(res => setUsers(res.data))
+      .then(res => {
+        let data = res.data;
+        if (role) {
+          data = data.filter(user => user.role === role);
+        }
+        setUsers(data);
+      })
       .catch(err => console.error("Error loading users:", err));
-  };
-
+  }, [role]);
+  
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

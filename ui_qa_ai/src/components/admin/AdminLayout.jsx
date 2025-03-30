@@ -9,7 +9,7 @@ const AdminLayout = () => {
         <h2 className="logo">Admin Panel</h2>
         <nav>
           <ul>
-            <li><Link to="/admin">Dashboard</Link></li>
+            <li><Link to="/admin/dashboardadmin">Dashboard</Link></li>
             <li><Link to="/admin/users">Users</Link></li>
             <li><Link to="/admin/settings">Settings</Link></li>
           </ul>
