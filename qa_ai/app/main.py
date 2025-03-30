@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import question, auth
-
+from app.routers import question, auth, users
 
 # Tạo instance FastAPI
 app = FastAPI()
@@ -18,6 +17,7 @@ app.add_middleware(
 # Thêm router
 app.include_router(question.router)
 app.include_router(auth.router)
+app.include_router(users.router)
 
 
 @app.get("/")

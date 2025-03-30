@@ -1,0 +1,105 @@
+.user-list {
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.user-list h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.form-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.form-section input,
+.form-section select {
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 180px;
+}
+
+.form-section button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.form-section button:hover {
+  background-color: #2980b9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 15px;
+  background-color: #fdfdfd;
+}
+
+thead {
+  background-color: #f4f6f8;
+}
+
+th, td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  color: #2d3436;
+}
+
+td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+td button {
+  margin-right: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+td button:first-child {
+  background-color: #27ae60;
+}
+
+td button:first-child:hover {
+  background-color: #219150;
+}
+
+td button:last-child {
+  background-color: #e74c3c;
+}
+
+td button:last-child:hover {
+  background-color: #c0392b;
+}

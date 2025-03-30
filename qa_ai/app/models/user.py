@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
 class User(BaseModel):
     id: int
     email: str
+    role: str
 
     class Config:
-        from_attributes = True  # Cho phép trả về dữ liệu từ SQL
+        from_attributes = True

@@ -7,6 +7,7 @@ import ApiKeyInput from './ApiKeyInput';
 import BloomLevels from './BloomLevels';
 import GenerateButton from './GenerateButton';
 import ResultSection from './ResultSection';
+import { useNavigate } from 'react-router-dom';
 import './styleui/Dashboard.css';
 
 const Dashboard = () => {
@@ -16,10 +17,10 @@ const Dashboard = () => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [bloomSum, setBloomSum] = useState(0);
-
+  const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login'; // hoặc dùng navigate('/login') nếu bạn đang dùng useNavigate()
+    navigate('/homedashboard')
   };
 
   const handleGenerateQuestions = async () => {

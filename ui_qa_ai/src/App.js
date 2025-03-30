@@ -7,31 +7,39 @@ import './styles.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomeDashboard from './page/HomeDashboard';
-
+import AdminLayout from './components/admin/AdminLayout';
+import UserList from './components/admin/UserList';
 
 const App = () => {
   return (
     <Router>
       <div>
-      <ToastContainer
-          position="top-right" // Vị trí thông báo (góc trên bên phải)
-          autoClose={3000} // Tự động đóng sau 3 giây
-          hideProgressBar={false} // Hiển thị thanh tiến trình
-          newestOnTop={false} // Thông báo mới không đè lên thông báo cũ
-          closeOnClick // Đóng khi nhấp vào thông báo
-          rtl={false} // Không đảo ngược (right-to-left)
-          pauseOnFocusLoss // Tạm dừng khi mất focus
-          draggable // Có thể kéo thông báo
-          pauseOnHover // Tạm dừng khi di chuột qua
-          theme="light" // Chủ đề sáng (có thể đổi thành "dark")
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
         />
+
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/homedashboard" element={<HomeDashboard />} />
+          <Route path="/" element={<HomeDashboard />} />
 
-          <Route path="/" element={<Login />} />
+          {/* ADMIN NESTED ROUTES */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<div>Welcome to Admin Dashboard</div>} />
+            <Route path="users" element={<UserList />} />
+            <Route path="settings" element={<div>Settings content</div>} />
+          </Route>
         </Routes>
       </div>
     </Router>
