@@ -14,7 +14,13 @@ const UserList = () => {
   const [editingId, setEditingId] = useState(null);
 
   const fetchUsers = useCallback(() => {
-    axios.get("http://127.0.0.1:8000/Usermanagement/getUsers")
+    axios.get("http://127.0.0.1:8000/Usermanagement/getUsers",
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    )
       .then(res => {
         let data = res.data;
         if (role) {
@@ -35,7 +41,13 @@ const UserList = () => {
 
   const handleSubmit = () => {
     if (editingId) {
-      axios.put(`http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`)
+      axios.put(`http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`,
+        {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+          },
+        }
+      )
         .then(() => {
           toast.success("User updated successfully!");
           setEditingId(null);
@@ -47,7 +59,13 @@ const UserList = () => {
           toast.error("Failed to update user.");
         });
     } else {
-      axios.post("http://127.0.0.1:8000/Usermanagement/createUser", form)
+      axios.post("http://127.0.0.1:8000/Usermanagement/createUser", form,
+        {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+          },
+        }
+      )
         .then(() => {
           toast.success("User created successfully!");
           setForm({ email: '', password: '', role: 'user' });
@@ -77,7 +95,13 @@ const UserList = () => {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`)
+        axios.delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`,
+          {
+            headers: {
+              'API-Key': process.env.REACT_APP_API_KEY,
+            },
+          }
+        )
           .then(() => {
             toast.success("User deleted successfully!");
             fetchUsers();
@@ -95,7 +119,13 @@ const UserList = () => {
       fetchUsers();
     } else {
       const encodedEmail = encodeURIComponent(searchEmail);
-      axios.get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`)
+      axios.get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`,
+        {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+          },
+        }
+      )
         .then(res => {
           setUsers([res.data]);
         })
@@ -107,7 +137,13 @@ const UserList = () => {
   };
 
   const toggleActive = (id, currentStatus) => {
-    axios.put(`http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`)
+    axios.put(`http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    )
       .then(() => {
         toast.success(`User has been ${!currentStatus ? 'unlocked' : 'locked'} successfully!`);
         fetchUsers();
@@ -140,7 +176,13 @@ const UserList = () => {
         const finalAmount = action === "add" ? amount : -amount;
 
         axios
-          .put(`http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`)
+          .put(`http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
+            {
+              headers: {
+                'API-Key': process.env.REACT_APP_API_KEY,
+              },
+            }
+          )
           .then(() => {
             toast.success(`${action === "add" ? "Cộng" : "Trừ"} tiền thành công!`);
             fetchUsers();

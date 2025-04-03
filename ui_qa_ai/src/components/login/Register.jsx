@@ -22,7 +22,13 @@ const Register = () => {
       await axios.post('http://127.0.0.1:8000/authentication/register', {
         email,
         password,
-      });
+      },
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    );
       toast.success('Đăng ký thành công!', {
               position: 'top-right',
               autoClose: 3000,
@@ -35,7 +41,10 @@ const Register = () => {
             });
       navigate('/login');
     } catch (err) {
-      toast.error('Đăng ký thất bại!', {
+      // Xử lý lỗi từ backend
+      const errorMessage = err.response?.data?.detail || 'Đăng ký thất bại.';
+      setError(errorMessage);
+      toast.error(errorMessage, {
               position: 'top-right',
               autoClose: 3000,
               hideProgressBar: false,
@@ -44,7 +53,7 @@ const Register = () => {
               draggable: true,
               progress: undefined,
               theme: 'light',
-            }); // Hiển thị thông báo lỗi
+            }); // Hiển thị thông báo lỗi từ backend
     }
   };
 

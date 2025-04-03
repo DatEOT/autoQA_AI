@@ -18,7 +18,13 @@ const Login = () => {
       const response = await axios.post('http://127.0.0.1:8000/authentication/login', {
         email,
         password,
-      });
+      },
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    );
       const { access_token, role } = response.data;
       localStorage.setItem('token', access_token);
       localStorage.setItem('role', role); // lưu lại nếu cần
@@ -37,7 +43,7 @@ const Login = () => {
       if (role === 'admin') {
         navigate('/admin');
       } else {
-        navigate('/dashboard');
+        navigate('/questiongenerator');
       }
 
     } catch (err) {

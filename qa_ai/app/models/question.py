@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict, Any
 
 
 # Input: Yêu cầu từ người dùng
@@ -14,13 +14,28 @@ class QuestionRequest(BaseModel):
 
 
 # Output: Kết quả tổng thể
-class FileResponse(BaseModel):
+class FileResponseModel(BaseModel):
     file_id: str = Field(..., description="ID của file")
     original_filename: str = Field(..., description="Tên file gốc")
-    num_segments: int = Field(
-        ..., description="Số đoạn trong file"
-    )  # Đổi từ num_chapters thành num_segments
-    txt_file_path: str = Field(..., description="Đường dẫn file .txt")
-    questions_and_answers: List[str] = Field(
+    num_segments: int = Field(..., description="Số đoạn trong file")
+    formatted_docx_download_url: str = Field(
+        ..., description="Đường dẫn file định dạng đầy đủ (.docx)"
+    )
+    simple_docx_download_url: str = Field(
+        ..., description="Đường dẫn file chỉ chứa câu hỏi (.docx)"
+    )
+    questions_and_answers: List[Dict[str, Any]] = Field(
         ..., description="Danh sách câu hỏi và đáp án từ tất cả các đoạn"
+    )
+
+
+# Output: Nội dung câu hỏi và câu trả lời theo các cấp độ Bloom
+class QAResponse(BaseModel):
+    bloom_assignment: str = Field(..., description="Phân bổ cấp độ Bloom")
+    qa_results: List[Dict[str, Any]] = Field(
+        ...,
+        description=(
+            "Danh sách kết quả Q&A, mỗi phần tử là dict có dạng: "
+            '{"level": <tên cấp độ>, "questions": {<câu hỏi>: <đáp án>, ...}}'
+        ),
     )

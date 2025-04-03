@@ -4,13 +4,17 @@ from app.models.user import User, UserCreate
 from app.utils.mysql_connection import get_db
 from app.security.auth import hash_password
 from decimal import Decimal
+from app.security.security import get_api_key
 
 router = APIRouter(prefix="/Usermanagement", tags=["Usermanagement"])
 
 
 # GET all users
 @router.get("/getUsers", response_model=list[User])
-def get_users(db: pymysql.connections.Connection = Depends(get_db)):
+def get_users(
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
     cursor = db.cursor()
     cursor.execute("SELECT idUser, email, role, is_active, balance FROM users")
     results = cursor.fetchall()
@@ -25,7 +29,11 @@ def get_users(db: pymysql.connections.Connection = Depends(get_db)):
 
 # GET one user by ID
 @router.get("/getUserID/{user_id}", response_model=User)
-def get_user(user_id: int, db: pymysql.connections.Connection = Depends(get_db)):
+def get_user(
+    user_id: int,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
     cursor = db.cursor()
     cursor.execute(
         "SELECT idUser, email, role, is_active, balance FROM users WHERE idUser = %s",
@@ -41,7 +49,11 @@ def get_user(user_id: int, db: pymysql.connections.Connection = Depends(get_db))
 
 # GET one user by Email
 @router.get("/getUserByEmail/{email}", response_model=User)
-def get_user_by_email(email: str, db: pymysql.connections.Connection = Depends(get_db)):
+def get_user_by_email(
+    email: str,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
     cursor = db.cursor()
     cursor.execute(
         "SELECT idUser, email, role, is_active, balance FROM users WHERE email = %s",
@@ -57,7 +69,11 @@ def get_user_by_email(email: str, db: pymysql.connections.Connection = Depends(g
 
 # POST create new user
 @router.post("/createUser", response_model=dict)
-def create_user(user: UserCreate, db: pymysql.connections.Connection = Depends(get_db)):
+def create_user(
+    user: UserCreate,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
     cursor = db.cursor()
     try:
         hashed_pw = hash_password(user.password)
@@ -74,7 +90,10 @@ def create_user(user: UserCreate, db: pymysql.connections.Connection = Depends(g
 # PUT update role
 @router.put("/updateUser/{user_id}", response_model=dict)
 def update_user_role(
-    user_id: int, role: str, db: pymysql.connections.Connection = Depends(get_db)
+    user_id: int,
+    role: str,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
 ):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE idUser = %s", (user_id,))
@@ -91,6 +110,7 @@ def update_balance(
     user_id: int,
     amount: float,  # client gửi số float, nhưng xử lý bằng Decimal
     db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
 ):
     cursor = db.cursor()
     cursor.execute("SELECT balance FROM users WHERE idUser = %s", (user_id,))
@@ -111,24 +131,12 @@ def update_balance(
     return {"message": "Balance updated", "new_balance": str(new_balance)}
 
 
-# DELETE user
-@router.delete("/delete/{user_id}", response_model=dict)
-def delete_user(user_id: int, db: pymysql.connections.Connection = Depends(get_db)):
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM users WHERE idUser = %s", (user_id,))
-    if not cursor.fetchone():
-        raise HTTPException(status_code=404, detail="User not found")
-
-    cursor.execute("DELETE FROM users WHERE idUser = %s", (user_id,))
-    db.commit()
-    return {"message": "User deleted successfully"}
-
-
 @router.put("/setActive/{user_id}", response_model=dict)
 def set_user_active(
     user_id: int,
     is_active: bool,
     db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
 ):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE idUser = %s", (user_id,))
@@ -141,3 +149,20 @@ def set_user_active(
     db.commit()
     status = "unlocked" if is_active else "locked"
     return {"message": f"User {status} successfully"}
+
+
+# DELETE user
+@router.delete("/delete/{user_id}", response_model=dict)
+def delete_user(
+    user_id: int,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users WHERE idUser = %s", (user_id,))
+    if not cursor.fetchone():
+        raise HTTPException(status_code=404, detail="User not found")
+
+    cursor.execute("DELETE FROM users WHERE idUser = %s", (user_id,))
+    db.commit()
+    return {"message": "User deleted successfully"}

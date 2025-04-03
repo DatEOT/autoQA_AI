@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/login/Login';
 import Register from './components/login/Register';
-import Dashboard from './components/UI/Dashboard';
+import QuestionGenerator from './components/UI/QuestionGenerator';
 import './styles.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,7 +31,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/questiongenerator" element={<QuestionGenerator />} />
           <Route path="/homedashboard" element={<HomeDashboard />} />
           <Route path="/" element={<HomeDashboard />} />
 

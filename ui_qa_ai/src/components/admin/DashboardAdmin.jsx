@@ -8,7 +8,13 @@ const DashboardAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/roleUser/countRoles")
+    axios.get("http://127.0.0.1:8000/roleUser/countRoles",
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    )
       .then(res => {
         setCounts({
           user: res.data.user || 0,

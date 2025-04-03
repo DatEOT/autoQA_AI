@@ -6,7 +6,13 @@ const LoginHistory = () => {
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/login_history/getAllHistory')
+    axios.get('http://127.0.0.1:8000/login_history/getAllHistory',
+      {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+        },
+      }
+    )
       .then(res => setLogs(res.data))
       .catch(err => console.error("Failed to fetch login history:", err));
   }, []);
