@@ -8,6 +8,7 @@ from app.routers import (
     login_history,
     statistics,
     transaction_history,
+    blogs,
 )
 
 # Tạo instance FastAPI
@@ -30,6 +31,7 @@ app.include_router(role.router)
 app.include_router(login_history.router)
 app.include_router(statistics.router)
 app.include_router(transaction_history.router)
+app.include_router(blogs.router)
 
 
 @app.get("/")

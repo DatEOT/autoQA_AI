@@ -5,7 +5,7 @@ import {
   CSidebarBrand,
   CSidebarHeader,
   CSidebarNav,
-  CNavGroup,
+  //CNavGroup,
   CNavItem,
   CNavTitle,
 } from '@coreui/react';
@@ -13,8 +13,10 @@ import CIcon from '@coreui/icons-react';
 import {
   cilSpeedometer,
   cilUser,
+  cilNotes,
   cilSettings,
   cilExitToApp,
+  cilHistory
 } from '@coreui/icons';
 
 const AdminLayout = () => {
@@ -39,26 +41,15 @@ const AdminLayout = () => {
           <CNavItem href="/admin/dashboardadmin" active={location.pathname === '/admin/dashboardadmin'}>
             <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Dashboard
           </CNavItem>
-
-          <CNavGroup
-            toggler={
-              <>
-                <CIcon customClassName="nav-icon" icon={cilUser} /> Users
-              </>
-            }
-            visible={
-              location.pathname.startsWith('/admin/users') ||
-              location.pathname.startsWith('/admin/transactionhistory')
-            }
-          >
-            <CNavItem href="/admin/users" active={location.pathname === '/admin/users'}>
-              User List
-            </CNavItem>
+          <CNavItem href="/admin/users" active={location.pathname === '/admin/users'}>
+            <CIcon customClassName="nav-icon" icon={cilUser} /> Users
+          </CNavItem>
             <CNavItem href="/admin/transactionhistory" active={location.pathname === '/admin/transactionhistory'}>
-              Transaction History
+            <CIcon customClassName="nav-icon" icon={cilHistory} /> Transaction History
             </CNavItem>
-          </CNavGroup>
-
+          <CNavItem href="/admin/adminblogmanager" active={location.pathname === '/admin/adminblogmanager'}>
+            <CIcon customClassName="nav-icon" icon={cilNotes} /> Blog
+          </CNavItem>
           <CNavItem href="/admin/settings" active={location.pathname === '/admin/settings'}>
             <CIcon customClassName="nav-icon" icon={cilSettings} /> Settings
           </CNavItem>

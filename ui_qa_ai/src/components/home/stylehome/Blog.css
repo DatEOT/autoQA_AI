@@ -1,0 +1,26 @@
+.custom-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    color: black;
+    border: 2px solid #ff6600;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .custom-btn:hover {
+    background-color: #ff6600;
+    color: white;
+  }
+  
+  h2, h3 {
+    color: #1a1a1a;
+  }
+  
+  section p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+  }
+  

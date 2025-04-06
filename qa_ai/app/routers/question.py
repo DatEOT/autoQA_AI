@@ -444,7 +444,7 @@ async def generate_questions(
             raise HTTPException(status_code=404, detail="Không tìm thấy người dùng")
 
         current_balance = row[0] or 0
-        cost = 50  # Số token cần trừ
+        cost = 10
 
         if current_balance < cost:
             raise HTTPException(status_code=400, detail="Không đủ token để tạo đề")

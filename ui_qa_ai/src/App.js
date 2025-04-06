@@ -13,7 +13,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import UserList from './components/admin/UserList';
 import DashboardAdmin from './components/admin/DashboardAdmin';
 import TransactionHistory from './components/admin/TransactionHistory';
-import '@ant-design/v5-patch-for-react-19';
+import AdminBlogManager from './components/admin/AdminBlogManager';
 
 const App = () => {
   return (
@@ -45,6 +45,7 @@ const App = () => {
             <Route path="users" element={<UserList />} />
             <Route path="transactionhistory" element={<TransactionHistory />} />
             <Route path="users/:role" element={<UserList />} />
+            <Route path="adminblogmanager" element={<AdminBlogManager />} />
             <Route path="settings" element={<div>Settings content</div>} />
           </Route>
         </Routes>

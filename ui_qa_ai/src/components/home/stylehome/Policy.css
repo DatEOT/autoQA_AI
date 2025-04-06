@@ -1,0 +1,20 @@
+.policy-box {
+    background-color: white;
+    padding: 25px 30px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+  }
+  
+  .policy-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  }
+  
+  .policy-box p {
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  
