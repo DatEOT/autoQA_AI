@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import './styleadmin/AdminLayout.css';
-import { FaTachometerAlt, FaUsers, FaHistory, FaCog, FaSignOutAlt } from 'react-icons/fa'; // Thêm biểu tượng từ react-icons
+import React from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import {
+  CSidebar,
+  CSidebarBrand,
+  CSidebarHeader,
+  CSidebarNav,
+  CNavGroup,
+  CNavItem,
+  CNavTitle,
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import {
+  cilSpeedometer,
+  cilUser,
+  cilSettings,
+  cilExitToApp,
+} from '@coreui/icons';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userMenuOpen, setUserMenuOpen] = useState(
-    location.pathname.startsWith('/admin/users')
-  );
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -16,58 +27,62 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="admin-container">
-      <aside className="admin-sidebar">
-        <h2 className="logo">Admin</h2>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/admin/dashboardadmin">
-                <FaTachometerAlt className="menu-icon" /> Dashboard
-              </Link>
-            </li>
-            
-            <li>
-              <div className="menu-parent" onClick={() => setUserMenuOpen(!userMenuOpen)}>
-                <FaUsers className="menu-icon" /> Users
-              </div>
-              {userMenuOpen && (
-                <ul className="submenu">
-                  <li>
-                    <Link to="/admin/users">
-                      <FaUsers className="submenu-icon" /> User List
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/loginhistory">
-                      <FaHistory className="submenu-icon" /> Login History
-                    </Link>
-                  </li>
-                </ul>
-              )}
-            </li>
+    <div className="d-flex vh-100">
+      {/* Sidebar */}
+      <CSidebar className="border-end" colorScheme="dark">
+        <CSidebarHeader className="border-bottom">
+          <CSidebarBrand>Admin</CSidebarBrand>
+        </CSidebarHeader>
+        <CSidebarNav>
+          <CNavTitle>Menu</CNavTitle>
 
-            <li>
-              <Link to="/admin/settings">
-                <FaCog className="menu-icon" /> Settings
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </aside>
+          <CNavItem href="/admin/dashboardadmin" active={location.pathname === '/admin/dashboardadmin'}>
+            <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Dashboard
+          </CNavItem>
 
-      <main className="admin-main">
-        <header className="admin-header">
-          <div className="admin-header-right">
-            <button className="logout-btn" onClick={handleLogout}>
-              <FaSignOutAlt /> Logout
+          <CNavGroup
+            toggler={
+              <>
+                <CIcon customClassName="nav-icon" icon={cilUser} /> Users
+              </>
+            }
+            visible={
+              location.pathname.startsWith('/admin/users') ||
+              location.pathname.startsWith('/admin/transactionhistory')
+            }
+          >
+            <CNavItem href="/admin/users" active={location.pathname === '/admin/users'}>
+              User List
+            </CNavItem>
+            <CNavItem href="/admin/transactionhistory" active={location.pathname === '/admin/transactionhistory'}>
+              Transaction History
+            </CNavItem>
+          </CNavGroup>
+
+          <CNavItem href="/admin/settings" active={location.pathname === '/admin/settings'}>
+            <CIcon customClassName="nav-icon" icon={cilSettings} /> Settings
+          </CNavItem>
+
+          <CNavItem className="px-3">
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline-light w-100 d-flex align-items-center gap-2"
+            >
+              <CIcon customClassName="nav-icon" icon={cilExitToApp} />
+              Logout
             </button>
-          </div>
-        </header>
-        <div className="admin-content">
+          </CNavItem>
+
+
+        </CSidebarNav>
+      </CSidebar>
+
+      {/* Main content */}
+      <div className="flex-grow-1 d-flex flex-column">
+        <div className="p-4 bg-light flex-grow-1 overflow-auto">
           <Outlet />
         </div>
-      </main>
+      </div>
     </div>
   );
 };

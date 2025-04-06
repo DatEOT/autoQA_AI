@@ -1,6 +1,6 @@
 import os
 import logging
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 from app.models.question import QuestionRequest, FileResponseModel, QAResponse
 from docx import Document
 import PyPDF2
@@ -18,6 +18,9 @@ from app.utils.create_docx import create_simple_docx_file
 from fastapi.responses import StreamingResponse
 import io
 import zipfile
+from app.utils.mysql_connection import get_db
+import pymysql
+from app.security.dependency import get_current_user_id
 
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO)
@@ -372,6 +375,8 @@ async def generate_questions(
     level_5: int = Form(..., ge=0),
     level_6: int = Form(..., ge=0),
     api_key: str = get_api_key,
+    db: pymysql.connections.Connection = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
 ):
     """Tạo câu hỏi và câu trả lời từ file tải lên dựa trên yêu cầu cấp độ Bloom."""
     try:
@@ -429,6 +434,36 @@ async def generate_questions(
                 detail=f"Số đoạn văn ({len(segments)}) không đủ để tạo {num_distinct_levels} cấp độ khác nhau.",
             )
 
+            # Trừ 50 token từ người dùng
+        cursor = db.cursor()
+        cursor.execute(
+            "SELECT balance FROM users WHERE idUser = %s", (current_user_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Không tìm thấy người dùng")
+
+        current_balance = row[0] or 0
+        cost = 50  # Số token cần trừ
+
+        if current_balance < cost:
+            raise HTTPException(status_code=400, detail="Không đủ token để tạo đề")
+
+        new_balance = current_balance - cost
+
+        cursor.execute(
+            "UPDATE users SET balance = %s WHERE idUser = %s",
+            (new_balance, current_user_id),
+        )
+
+        # Ghi log giao dịch trừ token
+        cursor.execute(
+            "INSERT INTO transactions (idUser, change_amount, new_balance) VALUES (%s, %s, %s)",
+            (current_user_id, -cost, new_balance),
+        )
+
+        db.commit()
+
         # Tạo câu hỏi và câu trả lời
         qa_result = generate_qa_content(segments, request, extracted_text)
 
@@ -443,6 +478,16 @@ async def generate_questions(
         create_simple_docx_file(
             qa_result, simple_docx_path, exam_subject, exam_duration
         )
+
+        try:
+            cursor = db.cursor()
+            cursor.execute(
+                "INSERT INTO question_history (idUser, num_questions) VALUES (%s, %s)",
+                (current_user_id, num_questions),
+            )
+            db.commit()
+        except Exception as e:
+            logger.error(f"Lỗi khi ghi lịch sử câu hỏi: {e}")
 
         # Trả về FileResponse với 2 đường dẫn file
         return FileResponseModel(

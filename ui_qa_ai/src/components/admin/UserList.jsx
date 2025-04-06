@@ -3,6 +3,15 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { Button } from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  LockOutlined,
+  UnlockOutlined,
+  PlusOutlined,
+  MinusOutlined,
+} from '@ant-design/icons';
 import 'react-toastify/dist/ReactToastify.css';
 import './styleadmin/UserList.css';
 
@@ -10,23 +19,43 @@ const UserList = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const { role } = useParams();
   const [users, setUsers] = useState([]);
+  const [lastLogins, setLastLogins] = useState({});
   const [form, setForm] = useState({ email: '', password: '', role: 'user' });
   const [editingId, setEditingId] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+
+  const fetchLastLogin = (userId) => {
+    axios.get(`http://127.0.0.1:8000/login_history/last_login/${userId}`, {
+      headers: {
+        'API-Key': process.env.REACT_APP_API_KEY,
+        'accept': 'application/json',
+      },
+    })
+    .then(res => {
+      const time = new Date(res.data.last_login).toLocaleString('vi-VN');
+      setLastLogins(prev => ({ ...prev, [userId]: time }));
+    })
+    .catch(err => {
+      console.error(`Failed to fetch last login for user ${userId}`, err);
+      setLastLogins(prev => ({ ...prev, [userId]: "N/A" }));
+    });
+  };
 
   const fetchUsers = useCallback(() => {
-    axios.get("http://127.0.0.1:8000/Usermanagement/getUsers",
-      {
-        headers: {
-          'API-Key': process.env.REACT_APP_API_KEY,
-        },
-      }
-    )
+    axios.get("http://127.0.0.1:8000/Usermanagement/getUsers", {
+      headers: {
+        'API-Key': process.env.REACT_APP_API_KEY,
+        'accept': 'application/json',
+      },
+    })
       .then(res => {
         let data = res.data;
         if (role) {
           data = data.filter(user => user.role === role);
         }
         setUsers(data);
+        data.forEach(user => fetchLastLogin(user.id));
       })
       .catch(err => console.error("Error loading users:", err));
   }, [role]);
@@ -41,10 +70,13 @@ const UserList = () => {
 
   const handleSubmit = () => {
     if (editingId) {
-      axios.put(`http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`,
+      axios.put(
+        `http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`,
+        {},
         {
           headers: {
             'API-Key': process.env.REACT_APP_API_KEY,
+            'accept': 'application/json',
           },
         }
       )
@@ -59,13 +91,12 @@ const UserList = () => {
           toast.error("Failed to update user.");
         });
     } else {
-      axios.post("http://127.0.0.1:8000/Usermanagement/createUser", form,
-        {
-          headers: {
-            'API-Key': process.env.REACT_APP_API_KEY,
-          },
-        }
-      )
+      axios.post("http://127.0.0.1:8000/Usermanagement/createUser", form, {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+          'accept': 'application/json',
+        },
+      })
         .then(() => {
           toast.success("User created successfully!");
           setForm({ email: '', password: '', role: 'user' });
@@ -81,6 +112,8 @@ const UserList = () => {
   const handleEdit = (user) => {
     setEditingId(user.id);
     setForm({ email: user.email, password: '', role: user.role });
+    setShowEditForm(true);
+    setShowCreateForm(false);
   };
 
   const handleDelete = (id) => {
@@ -92,16 +125,15 @@ const UserList = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`,
-          {
-            headers: {
-              'API-Key': process.env.REACT_APP_API_KEY,
-            },
-          }
-        )
+        axios.delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`, {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+            'accept': 'application/json',
+          },
+        })
           .then(() => {
             toast.success("User deleted successfully!");
             fetchUsers();
@@ -119,15 +151,15 @@ const UserList = () => {
       fetchUsers();
     } else {
       const encodedEmail = encodeURIComponent(searchEmail);
-      axios.get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`,
-        {
-          headers: {
-            'API-Key': process.env.REACT_APP_API_KEY,
-          },
-        }
-      )
+      axios.get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`, {
+        headers: {
+          'API-Key': process.env.REACT_APP_API_KEY,
+          'accept': 'application/json',
+        },
+      })
         .then(res => {
           setUsers([res.data]);
+          fetchLastLogin(res.data.id);
         })
         .catch(() => {
           toast.error("Không tìm thấy email!");
@@ -137,10 +169,13 @@ const UserList = () => {
   };
 
   const toggleActive = (id, currentStatus) => {
-    axios.put(`http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
+    axios.put(
+      `http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
+      null,
       {
         headers: {
           'API-Key': process.env.REACT_APP_API_KEY,
+          'accept': 'application/json',
         },
       }
     )
@@ -175,14 +210,16 @@ const UserList = () => {
         const amount = parseFloat(result.value);
         const finalAmount = action === "add" ? amount : -amount;
 
-        axios
-          .put(`http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
-            {
-              headers: {
-                'API-Key': process.env.REACT_APP_API_KEY,
-              },
-            }
-          )
+        axios.put(
+          `http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
+          null,
+          {
+            headers: {
+              'API-Key': process.env.REACT_APP_API_KEY,
+              'accept': 'application/json',
+            },
+          }
+        )
           .then(() => {
             toast.success(`${action === "add" ? "Cộng" : "Trừ"} tiền thành công!`);
             fetchUsers();
@@ -199,52 +236,83 @@ const UserList = () => {
     <div className="user-list">
       <h2>User Management</h2>
 
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search by email..."
-          value={searchEmail}
-          onChange={(e) => setSearchEmail(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
-
       <div className="form-section">
-        <input
-          type="text"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          disabled={editingId !== null}
-        />
-
-        {!editingId && (
+        <div className="search-bar">
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
+            type="text"
+            placeholder="Search by email..."
+            value={searchEmail}
+            onChange={(e) => setSearchEmail(e.target.value)}
           />
-        )}
+          <button onClick={handleSearch}>Search</button>
+        </div>
 
-        {editingId && (
-          <select name="role" value={form.role} onChange={handleChange}>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        )}
-
-        <button onClick={handleSubmit}>
-          {editingId ? "Update" : "Create"}
+        <button
+          onClick={() => {
+              if (showEditForm) {
+                // Nếu đang edit → tắt edit
+                setShowEditForm(false);
+                setEditingId(null);
+              } else {
+                // Toggle create form
+                setShowCreateForm(!showCreateForm);
+              }
+              // Reset form
+              setForm({ email: '', password: '', role: 'user' });
+            }}
+            className="create-user-btn"
+            >
+            {showEditForm
+              ? "Close Edit"
+              : showCreateForm
+              ? "Close Create Form"
+              : "CreateUser"}
         </button>
+
+
+        {showCreateForm && (
+          <>
+            <input
+              type="text"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+            />
+            <button onClick={handleSubmit}>Create</button>
+          </>
+        )}
+
+        {showEditForm && (
+          <>
+            <input
+              type="text"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              disabled
+            />
+            <select name="role" value={form.role} onChange={handleChange}>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button onClick={handleSubmit}>Update</button>
+          </>
+        )}
       </div>
 
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Email</th><th>Role</th><th>Active</th><th>Balance</th><th>Actions</th>
+            <th>ID</th><th>Email</th><th>Role</th><th>Active</th><th>Balance</th><th>Last Login</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -254,15 +322,42 @@ const UserList = () => {
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>{user.is_active ? '✅' : '❌'}</td>
-              <td>${parseFloat(user.balance).toFixed(2)}</td>
+              <td>{user.balance} 🪙</td>
+              <td>{lastLogins[user.id] || "Loading..."}</td>
               <td>
-                <button onClick={() => handleEdit(user)}>Edit</button>
-                <button className="delete-btn" onClick={() => handleDelete(user.id)}>Delete</button>
-                <button className="lock-btn" onClick={() => toggleActive(user.id, user.is_active)}>
-                  {user.is_active ? "Lock" : "Unlock"}
-                </button>
-                <button className="balance-btn add-balance" onClick={() => handleUpdateBalance(user.id, "add")}>+ $</button>
-                <button className="balance-btn sub-balance" onClick={() => handleUpdateBalance(user.id, "subtract")}>− $</button>
+                <Button
+                  type="default"
+                  icon={<EditOutlined />}
+                  shape="circle"
+                  onClick={() => handleEdit(user)}
+                />
+                <Button
+                  danger
+                  type="default"
+                  icon={<DeleteOutlined />}
+                  shape="circle"
+                  onClick={() => handleDelete(user.id)}
+                />
+                <Button
+                  type="primary"
+                  ghost
+                  icon={user.is_active ? <LockOutlined /> : <UnlockOutlined />}
+                  shape="circle"
+                  onClick={() => toggleActive(user.id, user.is_active)}
+                />
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  shape="circle"
+                  onClick={() => handleUpdateBalance(user.id, "add")}
+                />
+                <Button
+                  type="primary"
+                  danger
+                  icon={<MinusOutlined />}
+                  shape="circle"
+                  onClick={() => handleUpdateBalance(user.id, "subtract")}
+                />
               </td>
             </tr>
           ))}

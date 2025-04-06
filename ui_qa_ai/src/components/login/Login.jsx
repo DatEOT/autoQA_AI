@@ -27,7 +27,7 @@ const Login = () => {
     );
       const { access_token, role } = response.data;
       localStorage.setItem('token', access_token);
-      localStorage.setItem('role', role); // lưu lại nếu cần
+      localStorage.setItem('role', role);
 
       toast.success('Đăng nhập thành công!', {
         position: 'top-right',

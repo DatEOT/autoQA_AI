@@ -6,7 +6,10 @@ from app.utils.mysql_connection import get_db
 from app.security.security import get_api_key
 import re
 
-router = APIRouter(prefix="/authentication", tags=["authentication"])
+router = APIRouter(
+    prefix="/authentication",
+    tags=["authentication"],
+)
 
 
 def validate_password(password: str) -> bool:

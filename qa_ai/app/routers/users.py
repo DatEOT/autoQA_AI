@@ -5,6 +5,7 @@ from app.utils.mysql_connection import get_db
 from app.security.auth import hash_password
 from decimal import Decimal
 from app.security.security import get_api_key
+from datetime import datetime
 
 router = APIRouter(prefix="/Usermanagement", tags=["Usermanagement"])
 
@@ -108,7 +109,7 @@ def update_user_role(
 @router.put("/updateBalance/{user_id}", response_model=dict)
 def update_balance(
     user_id: int,
-    amount: float,  # client gửi số float, nhưng xử lý bằng Decimal
+    amount: int,
     db: pymysql.connections.Connection = Depends(get_db),
     api_key: str = get_api_key,
 ):
@@ -127,8 +128,23 @@ def update_balance(
     cursor.execute(
         "UPDATE users SET balance = %s WHERE idUser = %s", (str(new_balance), user_id)
     )
+
+    # Ghi log giao dịch KHÔNG CÓ description
+    cursor.execute(
+        """
+        INSERT INTO transactions (idUser, change_amount, new_balance)
+        VALUES (%s, %s, %s)
+        """,
+        (user_id, str(amount), str(new_balance)),
+    )
+
     db.commit()
-    return {"message": "Balance updated", "new_balance": str(new_balance)}
+    return {
+        "message": "Balance updated",
+        "change_amount": str(amount),
+        "new_balance": str(new_balance),
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
 
 
 @router.put("/setActive/{user_id}", response_model=dict)

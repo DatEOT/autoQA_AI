@@ -1,6 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import question, auth, users, role, login_history
+from app.routers import (
+    question,
+    auth,
+    users,
+    role,
+    login_history,
+    statistics,
+    transaction_history,
+)
 
 # Tạo instance FastAPI
 app = FastAPI()
@@ -20,6 +28,8 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(role.router)
 app.include_router(login_history.router)
+app.include_router(statistics.router)
+app.include_router(transaction_history.router)
 
 
 @app.get("/")

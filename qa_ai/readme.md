@@ -14,3 +14,6 @@ myproject_env\Scripts\activate
 pip freeze > requirements.txt
 
 Remove-Item -Path .git -Recurse -Force
+
+docker build -t react-app:dev .
+docker run -p 3000:3000 react-app:dev

@@ -13,7 +13,7 @@ class User(BaseModel):
     email: str
     role: str
     is_active: bool
-    balance: Decimal
+    balance: int
 
     class Config:
         from_attributes = True

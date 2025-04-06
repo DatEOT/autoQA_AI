@@ -1,207 +1,130 @@
-  .user-list {
-    background: #ffffff;
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    max-width: 1000px;
-    margin: 0 auto;
-  }
+.user-list {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 2000px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-  .user-list h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 24px;
-  }
+.user-list h2 {
+  color: #495057;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  .form-section {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+.search-bar {
+  display: flex;
+  justify-content: flex-start; /* Đưa về trái */
+  margin-bottom: 1px;
+  margin-left: 0; /* Bỏ margin trái nếu có */
+  padding-left: 0; /* Thêm dòng này để chắc chắn không bị lệch */
+}
 
-  .form-section input,
-  .form-section select {
-    padding: 10px 14px;
-    font-size: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    min-width: 180px;
-  }
+.search-bar input {
+  border: 1px solid #ced4da;
+  padding: 8px;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+  width: 250px;
+}
 
-  .form-section button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
+.search-bar button {
+  background-color: #4680ff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-  .form-section button:hover {
-    background-color: #2980b9;
-  }
+.search-bar button:hover {
+  background-color: #3c70df;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 8px;
-    overflow: hidden;
-    font-size: 15px;
-    background-color: #fdfdfd;
-  }
+.form-section {
+  display: flex;
+  justify-content: flex-start; /* trước đó là center */
+  align-items: center;
+  flex-wrap: wrap;  /* nếu bạn muốn xuống dòng khi hẹp */
+  gap: 8px;
+  margin-bottom: 20px;
+}
 
-  thead {
-    background-color: #f4f6f8;
-  }
+.form-section input, .form-section select {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px;
+}
 
-  th, td {
-    padding: 14px 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    color: #2d3436;
-  }
+.form-section button {
+  background-color: #2ed8b6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-  td {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
+.form-section button:hover {
+  background-color: #25c1a1;
+}
 
-  tbody tr:hover {
-    background-color: #f1f1f1;
-  }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #495057;
+}
 
-  td button {
-    margin-right: 6px;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
+thead {
+  background-color: #f4f7fa;
+}
 
-  td button:first-child {
-    background-color: #27ae60;
-  }
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
 
-  td button:first-child:hover {
-    background-color: #219150;
-  }
+tbody tr:hover {
+  background-color: #f1f3f6;
+}
 
-  td button:last-child {
-    background-color: #e74c3c;
-  }
+td button {
+  margin-right: 4px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 13px;
+  color: #fff;
+}
 
-  td button:last-child:hover {
-    background-color: #c0392b;
-  }
+button.delete-btn { background-color: #ff5252; }
+button.delete-btn:hover { background-color: #e04848; }
 
-  .search-bar {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+button.lock-btn { background-color: #ffa21d; }
+button.lock-btn:hover { background-color: #e09119; }
 
-  .search-bar input {
-    padding: 10px;
-    font-size: 15px;
-    width: 250px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
+button.balance-btn.add-balance { background-color: #11c15b; }
+button.balance-btn.add-balance:hover { background-color: #0ea14a; }
 
-  .search-bar button {
-    padding: 10px 16px;
-    background-color: #1abc9c;
-    color: white;
-    border: none;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
+button.balance-btn.sub-balance { background-color: #ff8a65; }
+button.balance-btn.sub-balance:hover { background-color: #e57857; }
 
-  .search-bar button:hover {
-    background-color: #16a085;
-  }
-  td button.lock-btn {
-    background-color: #f39c12;
-  }
+td button:first-child {
+  background-color: #4680ff;
+}
+td button:first-child:hover {
+  background-color: #3c70df;
+}
 
-  td button.lock-btn:hover {
-    background-color: #e67e22;
-  }
-
-  td button.delete-btn {
-    background-color: #e74c3c;
-  }
-
-  td button.delete-btn:hover {
-    background-color: #c0392b;
-  }
-
-  td button.balance-btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease;
-    margin-right: 6px;
-    color: white;
-    min-width: 36px;
-  }
-
-  td button.balance-btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease;
-    margin-right: 6px;
-    color: white;
-    min-width: 36px;
-  }
-
-  td button.balance-btn {
-    padding: 6px 12px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s ease;
-    margin-right: 6px;
-    color: white;
-    min-width: 40px;
-  }
-  
-  td button.add-balance {
-    background: #2ecc71;
-  }
-  
-  td button.add-balance:hover {
-    background: #27ae60;
-  }
-  
-  td button.sub-balance {
-    background: #e67e22;
-  }
-  
-  td button.sub-balance:hover {
-    background: #d35400;
-  }
-  
+td {
+  white-space: nowrap;
+}
 
