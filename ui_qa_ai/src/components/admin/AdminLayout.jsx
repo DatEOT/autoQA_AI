@@ -41,7 +41,7 @@ const AdminLayout = () => {
           <CNavItem href="/admin/dashboardadmin" active={location.pathname === '/admin/dashboardadmin'}>
             <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Dashboard
           </CNavItem>
-          <CNavItem href="/admin/users" active={location.pathname === '/admin/users'}>
+          <CNavItem href="/admin/userlist" active={location.pathname === '/admin/userlist'}>
             <CIcon customClassName="nav-icon" icon={cilUser} /> Users
           </CNavItem>
             <CNavItem href="/admin/transactionhistory" active={location.pathname === '/admin/transactionhistory'}>

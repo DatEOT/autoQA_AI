@@ -3,6 +3,7 @@ from app.models.question import QAResponse
 from docx import Document
 from docx.shared import Pt, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from fastapi import HTTPException
 
 
 def create_formatted_docx_file(
@@ -10,12 +11,15 @@ def create_formatted_docx_file(
 ) -> None:
     """
     Tạo file DOCX với định dạng:
-      - Tiêu đề: "ĐỀ THI TỰ LUẬN" (gán cứng)
-      - Môn thi và thời gian làm bài: do người dùng nhập vào
-      - Phân bổ điểm cho mỗi cấp độ Bloom (từ thấp đến cao) và chia đều số điểm cho từng câu hỏi trong mỗi cấp,
-        sao cho tổng số điểm là 10.
-        Ví dụ: Nếu cấp được 3 điểm và có 2 câu hỏi, mỗi câu nhận 1.5 điểm; nếu có 7 câu thì mỗi câu nhận ~0.43 điểm.
-      - Danh sách câu hỏi (theo cấp độ Bloom) kèm đáp án
+      - Tiêu đề: "ĐỀ THI TỰ LUẬN"
+      - Thông tin môn thi và thời gian làm bài
+      - Phân bố điểm cho mỗi cấp độ Bloom với cơ chế:
+            Nếu có 6 cấp: [10%, 15%, 20%, 20%, 20%, 15%]
+            Nếu khác: cấp 1 luôn 10% và các cấp còn lại chia đều 90%.
+        => Tổng điểm là 10.
+        Và phân chia đều số điểm cho từng câu hỏi của mỗi cấp,
+        làm tròn đến bội số của 0.05.
+      - Danh sách câu hỏi (theo cấp độ Bloom) kèm đáp án.
     """
     doc = Document()
 
@@ -55,33 +59,46 @@ def create_formatted_docx_file(
     doc.add_heading("PHÂN BỔ CẤP ĐỘ BLOOM:", level=1)
     doc.add_paragraph(qa_result.bloom_assignment)
 
-    # Tính số cấp độ và tổng trọng số (cấp 1 có trọng số 1, cấp 2 trọng số 2, v.v.)
+    # Xác định số cấp độ hiện có
     num_levels = len(qa_result.qa_results)
-    total_weight = sum(range(1, num_levels + 1))
-
-    # Tính điểm cho từng cấp dưới dạng số thực với tổng điểm là 10
-    # raw_points = 10 * (i+1) / total_weight cho cấp i
-    level_points_alloc = [10 * (i + 1) / total_weight for i in range(num_levels)]
+    if num_levels == 6:
+        percentages = [0.10, 0.15, 0.20, 0.20, 0.20, 0.15]
+    else:
+        if num_levels < 2:
+            raise HTTPException(status_code=500, detail="Phải có ít nhất 2 cấp độ")
+        percentages = [0.10] + [0.90 / (num_levels - 1)] * (num_levels - 1)
 
     # ------------------- CÂU HỎI VÀ CÂU TRẢ LỜI -------------------
     doc.add_heading("CÂU HỎI VÀ CÂU TRẢ LỜI:", level=1)
     question_counter = 1
 
-    # Lặp qua các cấp độ Bloom (giả sử thứ tự trong danh sách là từ thấp đến cao)
+    # Lặp qua từng cấp độ Bloom (theo thứ tự từ thấp đến cao)
     for level_idx, level_result in enumerate(qa_result.qa_results):
         # Heading cho cấp độ Bloom (ví dụ: "Cấp độ 1 - Nhớ")
         doc.add_heading(level_result["level"], level=2)
         questions_dict = level_result["questions"]
         num_questions = len(questions_dict)
 
-        # Tính điểm được phân bổ cho cấp hiện tại
-        level_total_points = level_points_alloc[level_idx]
-        # Chia đều số điểm cho mỗi câu (làm tròn đến 2 chữ số thập phân)
-        points_per_question = (
-            round(level_total_points / num_questions, 2) if num_questions > 0 else 0
-        )
+        # Tổng điểm cho cấp (ví dụ: nếu 6 cấp và cấp 1 thì 10% của 10 = 1.0 điểm)
+        level_total_points = percentages[level_idx] * 10
 
-        for question, answer in questions_dict.items():
+        # Phân chia điểm cho từng câu trong cấp, làm tròn đến bội số 0.05
+        points_alloc = []
+        if num_questions > 0:
+            # Tính điểm cho từng câu (cho tất cả các câu trừ câu cuối cùng)
+            for i in range(num_questions - 1):
+                raw = level_total_points / num_questions
+                nice = round(raw * 20) / 20  # làm tròn đến 0.05
+                points_alloc.append(nice)
+            sum_so_far = sum(points_alloc)
+            last_point = level_total_points - sum_so_far
+            last_nice = round(last_point * 20) / 20
+            points_alloc.append(last_nice)
+        else:
+            points_alloc = []
+
+        # Lặp qua từng câu hỏi, dùng chỉ số cục bộ để truy cập points_alloc
+        for idx, (question, answer) in enumerate(questions_dict.items()):
             para_question = doc.add_paragraph()
             run_question_title = para_question.add_run(f"Câu {question_counter}: ")
             run_question_title.bold = True
@@ -89,7 +106,7 @@ def create_formatted_docx_file(
             run_question_text = para_question.add_run(question)
             run_question_text.font.bold = False
 
-            run_points = para_question.add_run(f" ({points_per_question} điểm)")
+            run_points = para_question.add_run(f" ({points_alloc[idx]} điểm)")
             run_points.bold = True
 
             para_answer_title = doc.add_paragraph()
@@ -108,16 +125,8 @@ def create_simple_docx_file(
     qa_result: QAResponse, docx_file_path: Path, exam_subject: str, exam_duration: str
 ) -> None:
     """
-    Tạo file DOCX đơn giản chỉ chứa phần header giống file formatted_docx_file và danh sách câu hỏi với điểm.
-    Header bao gồm:
-      - ĐỀ THI TỰ LUẬN
-      - Môn thi: {exam_subject}
-      - Thời gian làm bài: {exam_duration}
-      - (Thí sinh không được phép sử dụng tài liệu)
-    Sau đó là danh sách các câu hỏi với điểm được chia đều theo cấp độ Bloom (từ thấp đến cao) sao cho tổng điểm là 10.
-    Mỗi câu hỏi nhận số điểm là:
-          level_total_points / số câu hỏi trong cấp
-    (Ví dụ: nếu cấp được 3 điểm và có 2 câu hỏi, mỗi câu nhận 1.5 điểm.)
+    Tạo file DOCX đơn giản chỉ chứa phần header và danh sách câu hỏi với điểm,
+    sử dụng cơ chế phân bố điểm giống như create_formatted_docx_file.
     """
     doc = Document()
 
@@ -144,27 +153,40 @@ def create_simple_docx_file(
 
     doc.add_paragraph("")
 
-    # Tính số cấp độ và tổng trọng số
+    # Xác định số cấp độ
     num_levels = len(qa_result.qa_results)
-    total_weight = sum(range(1, num_levels + 1))
+    if num_levels == 6:
+        percentages = [0.10, 0.15, 0.20, 0.20, 0.20, 0.15]
+    else:
+        if num_levels < 2:
+            raise HTTPException(status_code=500, detail="Phải có ít nhất 2 cấp độ")
+        percentages = [0.10] + [0.90 / (num_levels - 1)] * (num_levels - 1)
 
-    # Tính điểm cho từng cấp dưới dạng số thực với tổng điểm là 10
-    level_points_alloc = [10 * (i + 1) / total_weight for i in range(num_levels)]
-
+    # Tính toán và phân phối điểm cho từng câu hỏi
     question_counter = 1
 
     for level_idx, level_result in enumerate(qa_result.qa_results):
         questions_dict = level_result["questions"]
         num_questions = len(questions_dict)
-        level_total_points = level_points_alloc[level_idx]
-        points_per_question = (
-            round(level_total_points / num_questions, 2) if num_questions > 0 else 0
-        )
+        level_total_points = percentages[level_idx] * 10
 
-        for question, _ in questions_dict.items():
+        points_alloc = []
+        if num_questions > 0:
+            for i in range(num_questions - 1):
+                raw = level_total_points / num_questions
+                nice = round(raw * 20) / 20
+                points_alloc.append(nice)
+            sum_so_far = sum(points_alloc)
+            last_point = level_total_points - sum_so_far
+            last_nice = round(last_point * 20) / 20
+            points_alloc.append(last_nice)
+        else:
+            points_alloc = []
+
+        for idx, (question, _) in enumerate(questions_dict.items()):
             para = doc.add_paragraph()
             para.add_run(
-                f"Câu {question_counter}: {question} ({points_per_question} điểm)"
+                f"Câu {question_counter}: {question} ({points_alloc[idx]} điểm)"
             )
             question_counter += 1
 

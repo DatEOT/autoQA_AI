@@ -3,7 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import './styleui/QuestionGenerator.css';
-
+import { DownloadOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 const BloomLevels = ({ totalQuestions, onSumChange }) => {
   const [levels, setLevels] = useState({
     level_1: 0,
@@ -80,7 +81,7 @@ const DownloadSection = ({ results }) => {
       </div>
     );
   }
-  // Tạo URL download file zip dựa trên file_id trả về từ backend
+
   const zipUrl = `http://127.0.0.1:8000/questions/download/zip/${results.file_id}`;
   return (
     <div className="result-section">
@@ -95,15 +96,17 @@ const DownloadSection = ({ results }) => {
         <strong>Số đoạn:</strong> {results.num_segments}
       </p>
       <div className="download-buttons">
-        <a
-          href={zipUrl}
-          download
-          target="_blank"
-          rel="noopener noreferrer"
-          className="download-btn"
-        >
-          Tải file ZIP chứa file Word
-        </a>
+      <Button
+        type="primary"
+        shape="round"
+        icon={<DownloadOutlined />}
+        size="large"
+        href={zipUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Tải file ZIP chứa Word
+      </Button>
       </div>
     </div>
   );

@@ -78,7 +78,8 @@ async def login(
 
     stored_password = db_user[2]
     role = db_user[3]
-    is_active = db_user[4]  # is_active cột thứ 5
+    is_active = db_user[4]
+    balance = db_user[5]
 
     if not is_active:
         raise HTTPException(status_code=403, detail="Tài khoản đã bị khóa")
@@ -95,4 +96,5 @@ async def login(
         "access_token": access_token,
         "token_type": "bearer",
         "role": role,
+        "balance": balance,
     }

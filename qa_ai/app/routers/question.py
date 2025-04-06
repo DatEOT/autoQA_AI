@@ -15,12 +15,15 @@ from pathlib import Path
 import re
 from app.utils.create_docx import create_formatted_docx_file
 from app.utils.create_docx import create_simple_docx_file
+from app.utils.create_pdf import create_formatted_pdf_file
+from app.utils.create_pdf import create_simple_pdf_file
 from fastapi.responses import StreamingResponse
 import io
 import zipfile
 from app.utils.mysql_connection import get_db
 import pymysql
 from app.security.dependency import get_current_user_id
+from docx2pdf import convert
 
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO)
@@ -342,18 +345,48 @@ def convert_txt_to_docx_and_delete(txt_path: Path) -> Path:
     return docx_file_path
 
 
+def convert_docx_to_pdf(docx_path: Path, pdf_path: Path) -> None:
+    """
+    Chuyển đổi file DOCX sang PDF.
+
+    Args:
+        docx_path (Path): Đường dẫn tới file DOCX.
+        pdf_path (Path): Đường dẫn file PDF sẽ được tạo ra.
+    """
+    try:
+        convert(str(docx_path), str(pdf_path))
+    except Exception as e:
+        logger.error(f"Lỗi khi chuyển đổi {docx_path} sang PDF: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Lỗi khi chuyển đổi file: {str(e)}"
+        )
+
+
 @router.get("/download/zip/{file_id}", response_class=StreamingResponse)
 def download_zip(file_id: str):
-    formatted_file = TXT_DIR / f"{file_id}_formatted.docx"
-    simple_file = TXT_DIR / f"{file_id}_simple.docx"
-    if not formatted_file.exists() or not simple_file.exists():
-        raise HTTPException(
-            status_code=404, detail="Một hoặc cả hai file không tồn tại."
-        )
+    # Xác định đường dẫn 4 file: 2 file DOCX và 2 file PDF
+    formatted_docx_file = TXT_DIR / f"{file_id}_formatted.docx"
+    simple_docx_file = TXT_DIR / f"{file_id}_simple.docx"
+    formatted_pdf_file = TXT_DIR / f"{file_id}_formatted.pdf"
+    simple_pdf_file = TXT_DIR / f"{file_id}_simple.pdf"
+
+    for file_path in [
+        formatted_docx_file,
+        simple_docx_file,
+        formatted_pdf_file,
+        simple_pdf_file,
+    ]:
+        if not file_path.exists():
+            raise HTTPException(
+                status_code=404, detail="Một hoặc nhiều file không tồn tại."
+            )
+
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-        zipf.write(formatted_file, arcname=f"{file_id}_formatted.docx")
-        zipf.write(simple_file, arcname=f"{file_id}_simple.docx")
+        zipf.write(formatted_docx_file, arcname=f"{file_id}_formatted.docx")
+        zipf.write(simple_docx_file, arcname=f"{file_id}_simple.docx")
+        zipf.write(formatted_pdf_file, arcname=f"{file_id}_formatted.pdf")
+        zipf.write(simple_pdf_file, arcname=f"{file_id}_simple.pdf")
     zip_buffer.seek(0)
     return StreamingResponse(
         zip_buffer,
@@ -478,6 +511,12 @@ async def generate_questions(
         create_simple_docx_file(
             qa_result, simple_docx_path, exam_subject, exam_duration
         )
+
+        # Chuyển đổi 2 file DOCX vừa tạo sang PDF
+        formatted_pdf_path = TXT_DIR / f"{file_id}_formatted.pdf"
+        simple_pdf_path = TXT_DIR / f"{file_id}_simple.pdf"
+        convert_docx_to_pdf(formatted_docx_path, formatted_pdf_path)
+        convert_docx_to_pdf(simple_docx_path, simple_pdf_path)
 
         try:
             cursor = db.cursor()

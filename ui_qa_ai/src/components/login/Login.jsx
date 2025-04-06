@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import lockIcon from '../../assets/images/lock-icon.png';
 import userIcon from '../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
-import './styleauth/Login.css'
+import './styleauth/Login.css';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,54 +15,49 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(''); // reset lỗi cũ
     try {
-      const response = await axios.post('http://127.0.0.1:8000/authentication/login', {
-        email,
-        password,
-      },
-      {
-        headers: {
-          'API-Key': process.env.REACT_APP_API_KEY,
-        },
+      const response = await axios.post(
+        'http://127.0.0.1:8000/authentication/login',
+        { email, password },
+        {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+          },
+        }
+      );
+  
+      const { access_token, role, balance } = response.data;
+  
+      // 👇 Chặn user nếu hết token
+      if (role === 'user' && (balance === null || balance <= 0)) {
+        setError('Tài khoản của bạn không đủ token để sử dụng.');
+        toast.error('Token đã hết, vui lòng nạp thêm!');
+        return;
       }
-    );
-      const { access_token, role } = response.data;
+  
       localStorage.setItem('token', access_token);
       localStorage.setItem('role', role);
-
+  
       toast.success('Đăng nhập thành công!', {
         position: 'top-right',
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
         theme: 'light',
       });
-
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/questiongenerator');
-      }
-
+  
+      navigate(role === 'admin' ? '/admin' : '/questiongenerator');
     } catch (err) {
-      if (err.response?.data?.detail === "Tài khoản đã bị khóa") {
-        setError("Tài khoản của bạn đã bị khóa.");
+      if (err.response?.data?.detail === 'Tài khoản đã bị khóa') {
+        setError('Tài khoản của bạn đã bị khóa.');
       } else {
-        setError("Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.");
-      }      
+        setError('Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
+      }
+  
       toast.error('Đăng nhập thất bại!', {
         position: 'top-right',
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
         theme: 'light',
-      }); // Hiển thị thông báo lỗi
+      });
     }
   };
 

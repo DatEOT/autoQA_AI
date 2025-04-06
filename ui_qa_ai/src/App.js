@@ -14,6 +14,8 @@ import UserList from './components/admin/UserList';
 import DashboardAdmin from './components/admin/DashboardAdmin';
 import TransactionHistory from './components/admin/TransactionHistory';
 import AdminBlogManager from './components/admin/AdminBlogManager';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const App = () => {
   return (
@@ -42,9 +44,8 @@ const App = () => {
           {/* ADMIN NESTED ROUTES */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboardadmin" element={<DashboardAdmin />} />
-            <Route path="users" element={<UserList />} />
+            <Route path="userlist" element={<UserList />} />
             <Route path="transactionhistory" element={<TransactionHistory />} />
-            <Route path="users/:role" element={<UserList />} />
             <Route path="adminblogmanager" element={<AdminBlogManager />} />
             <Route path="settings" element={<div>Settings content</div>} />
           </Route>
