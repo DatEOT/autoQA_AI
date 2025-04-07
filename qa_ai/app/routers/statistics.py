@@ -11,7 +11,7 @@ router = APIRouter(prefix="/QuestionStats", tags=["QuestionStats"])
 @router.get(
     "/getAllUserStats",
     response_model=list[UserQuestionStats],
-    summary="Thống kê số lần tạo và tổng số câu hỏi của tất cả user",
+    summary="Thống kê số lần tạo và tổng số câu hỏi của tất cả user (kèm email)",
 )
 def get_all_user_stats(
     db: pymysql.connections.Connection = Depends(get_db),
@@ -21,19 +21,22 @@ def get_all_user_stats(
     cursor.execute(
         """
         SELECT
-          idUser,
+          qh.idUser,
+          u.email,
           COUNT(*) AS create_count,
-          COALESCE(SUM(num_questions), 0) AS total_questions
-        FROM question_history
-        GROUP BY idUser
+          COALESCE(SUM(qh.num_questions), 0) AS total_questions
+        FROM question_history qh
+        JOIN users u ON qh.idUser = u.idUser
+        GROUP BY qh.idUser, u.email
         """
     )
     rows = cursor.fetchall()
     return [
         UserQuestionStats(
             idUser=row[0],
-            create_count=row[1],
-            total_questions=row[2],
+            email=row[1],
+            create_count=row[2],
+            total_questions=row[3],
         )
         for row in rows
     ]

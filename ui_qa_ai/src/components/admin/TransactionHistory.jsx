@@ -3,37 +3,74 @@ import axios from "axios";
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
+  const [searchId, setSearchId] = useState("");
 
-  useEffect(() => {
+  // Hàm lấy tất cả giao dịch
+  const fetchAllTransactions = () => {
     axios
       .get("http://127.0.0.1:8000/transactionHistory/", {
-        headers: {
-          "API-Key": process.env.REACT_APP_API_KEY,
-        },
+        headers: { "API-Key": process.env.REACT_APP_API_KEY },
       })
       .then((res) => setTransactions(res.data))
       .catch((err) => console.error("Lỗi khi lấy giao dịch:", err));
+  };
+
+  // Lấy tất cả giao dịch khi component được mount
+  useEffect(() => {
+    fetchAllTransactions();
   }, []);
 
+  // Hàm xử lý tìm kiếm giao dịch theo idUser
+  const handleSearch = () => {
+    if (searchId.trim() === "") {
+      fetchAllTransactions();
+      return;
+    }
+    axios
+      .get(`http://127.0.0.1:8000/transactionHistory/${searchId}`, {
+        headers: { "API-Key": process.env.REACT_APP_API_KEY },
+      })
+      .then((res) => setTransactions(res.data))
+      .catch((err) => console.error("Lỗi khi tìm kiếm giao dịch:", err));
+  };
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Lịch sử giao dịch</h2>
-      <table className="min-w-full border border-gray-300">
-        <thead className="bg-gray-100">
+    <div className="container p-4">
+      <h2 className="mb-4">Transaction History</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by ID User"
+          value={searchId}
+          onChange={(e) => {
+            setSearchId(e.target.value);
+            // Khi ô tìm kiếm rỗng, tự động reset bảng hiển thị toàn bộ giao dịch
+            if (e.target.value.trim() === "") {
+              fetchAllTransactions();
+            }
+          }}
+          className="form-control d-inline-block w-auto mr-2"
+        />
+        <button onClick={handleSearch} className="btn btn-primary">
+          Search
+        </button>
+      </div>
+      <table className="table table-bordered">
+        <thead className="thead-light">
           <tr>
-            <th className="py-2 px-4 border">ID người dùng</th>
-            <th className="py-2 px-4 border">Thời gian</th>
-            <th className="py-2 px-4 border">Thay đổi</th>
-            <th className="py-2 px-4 border">Số dư mới</th>
+            <th>User ID</th>
+            <th>Time</th>
+            <th>Change Amount</th>
+            <th>New Balance</th>
           </tr>
         </thead>
         <tbody>
           {transactions.map((t, index) => (
             <tr key={index}>
-              <td className="py-2 px-4 border">{t.idUser}</td>
-              <td className="py-2 px-4 border">{t.timestamp}</td>
-              <td className="py-2 px-4 border text-blue-600">{t.change_amount}</td>
-              <td className="py-2 px-4 border">{t.new_balance}</td>
+              <td>{t.idUser}</td>
+              <td>{t.timestamp}</td>
+              <td className="text-primary">{t.change_amount}</td>
+              <td>{t.new_balance}</td>
             </tr>
           ))}
         </tbody>

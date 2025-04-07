@@ -45,7 +45,7 @@ const Login = () => {
         theme: 'light',
       });
   
-      navigate(role === 'admin' ? '/admin' : '/questiongenerator');
+      navigate(role === 'admin' ? '/admin/dashboardadmin' : '/questiongenerator');
     } catch (err) {
       if (err.response?.data?.detail === 'Tài khoản đã bị khóa') {
         setError('Tài khoản của bạn đã bị khóa.');

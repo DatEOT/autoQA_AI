@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class UserQuestionStats(BaseModel):
     idUser: int
+    email: str
     create_count: int
     total_questions: int
 

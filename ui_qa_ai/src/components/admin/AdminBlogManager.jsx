@@ -93,11 +93,11 @@ function AdminBlogManager() {
 
   return (
     <div className="container my-5">
-      <h2 className="mb-4">{isEditing ? "Chỉnh sửa Blog" : "Tạo Blog Mới"}</h2>
+      <h2 className="mb-4">{isEditing ? "Edit Blog" : "Create New Blog"}</h2>
 
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mb-3">
-          <label className="form-label">Tiêu đề</label>
+          <label className="form-label">Title</label>
           <input
             type="text"
             className="form-control"
@@ -108,7 +108,7 @@ function AdminBlogManager() {
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Nội dung</label>
+          <label className="form-label">Content</label>
           <textarea
             className="form-control"
             name="content"
@@ -119,7 +119,7 @@ function AdminBlogManager() {
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Link ảnh (nếu có)</label>
+          <label className="form-label">Image URL (if any)</label>
           <input
             type="text"
             className="form-control"
@@ -130,7 +130,7 @@ function AdminBlogManager() {
         </div>
 
         <button type="submit" className="btn btn-success me-2">
-          {isEditing ? "Cập nhật" : "Tạo mới"}
+          {isEditing ? "Cập nhật" : "Create"}
         </button>
         {isEditing && (
           <button type="button" className="btn btn-secondary" onClick={resetForm}>
@@ -139,16 +139,16 @@ function AdminBlogManager() {
         )}
       </form>
 
-      <h3 className="mb-3">Danh sách Blog</h3>
+      <h3 className="mb-3">Blog List</h3>
       <div className="table-responsive">
         <table className="table table-bordered align-middle">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Tiêu đề</th>
-              <th>Ảnh</th>
-              <th>Nội dung</th>
-              <th>Hành động</th>
+              <th>Title</th>
+              <th>Image</th>
+              <th>Content</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -170,10 +170,10 @@ function AdminBlogManager() {
                 </td>
                 <td>
                   <button className="btn btn-primary btn-sm me-2" onClick={() => handleEdit(blog)}>
-                    Sửa
+                    Edit
                   </button>
                   <button className="btn btn-danger btn-sm" onClick={() => handleDelete(blog.id)}>
-                    Xoá
+                    Delete
                   </button>
                 </td>
               </tr>

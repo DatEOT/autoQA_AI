@@ -28,3 +28,34 @@ def get_all_transaction_history(
         }
         for row in rows
     ]
+
+
+@router.get("/{idUser}", response_model=list[dict])
+def get_transaction_history_by_user(
+    idUser: int,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        SELECT * FROM transactions
+        WHERE idUser = %s
+        ORDER BY timestamp DESC
+        """,
+        (idUser,),
+    )
+    rows = cursor.fetchall()
+    # Lấy tên các cột từ cursor.description
+    columns = [desc[0] for desc in cursor.description]
+    results = []
+    for row in rows:
+        record = {}
+        for col, value in zip(columns, row):
+            # Nếu là kiểu datetime, định dạng lại thành chuỗi
+            if hasattr(value, "strftime"):
+                record[col] = value.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                record[col] = value
+        results.append(record)
+    return results

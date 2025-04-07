@@ -23,7 +23,9 @@ import {
   LabelList,
 } from 'recharts';
 import dayjs from 'dayjs';
+import { motion, AnimatePresence } from 'framer-motion';
 import '@ant-design/v5-patch-for-react-19';
+
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
@@ -42,6 +44,7 @@ const Dashboard = () => {
   const [range, setRange] = useState([null, null]);
   const [rangeStats, setRangeStats] = useState({ creation: 0, questions: 0 });
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("chart");
 
   useEffect(() => {
     const now = new Date();
@@ -163,14 +166,15 @@ const Dashboard = () => {
   };
 
   const chartData = [
-    { name: 'Lần tạo đề', value: rangeStats.creation },
-    { name: 'Số câu hỏi', value: rangeStats.questions },
+    { name: 'Created Times', value: rangeStats.creation },
+    { name: 'Number of Questions', value: rangeStats.questions },
   ];
 
   const userColumns = [
-    { title: 'ID Người dùng', dataIndex: 'idUser', key: 'idUser' },
-    { title: 'Số lần tạo', dataIndex: 'create_count', key: 'create_count' },
-    { title: 'Tổng số câu hỏi', dataIndex: 'total_questions', key: 'total_questions' },
+    { title: 'ID User', dataIndex: 'idUser', key: 'idUser' },
+    { title: 'Email', dataIndex: 'email', key: 'email' },
+    { title: 'Number of creations', dataIndex: 'create_count', key: 'create_count' },
+    { title: 'Total number of questions', dataIndex: 'total_questions', key: 'total_questions' },
   ];
 
   const cardStyle = {
@@ -182,25 +186,60 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '24px 24px 40px 24px', fontFamily: 'Segoe UI, sans-serif' }}>
-      <Title level={2} style={{ marginBottom: 24 }}>📊 Thống kê câu hỏi</Title>
+      <Title level={2} style={{ marginBottom: 24 }}>📊 Question Statistics</Title>
 
       <Row gutter={[24, 24]}>
-        {[
-          { title: "Số câu hỏi hôm nay", value: statsToShow.day },
-          { title: "Trong tháng", value: statsToShow.month },
-          { title: "Trong năm", value: statsToShow.year },
-          { title: "Tổng số câu hỏi", value: statsToShow.total },
-        ].map((item, index) => (
-          <Col xs={24} sm={12} md={6} key={index}>
-            <Card style={cardStyle}>
-              <Statistic
-                title={item.title}
-                value={item.value}
-                prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
-              />
-            </Card>
-          </Col>
-        ))}
+        <AnimatePresence>
+          {activeTab === 'top-users'
+            ? topUsers.slice(0, 4).map((user, index) => (
+                <Col xs={24} sm={12} md={6} key={user.idUser}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card style={cardStyle}>
+                      <Statistic
+                        title={`User ID: ${user.idUser}`}
+                        value={user.total_questions}
+                        suffix="questions"
+                        prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                      />
+                      <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+                        {user.email}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+                        Top {index + 1} User
+                      </div>
+                    </Card>
+                  </motion.div>
+                </Col>
+              ))
+            : [
+                { title: "Questions Today", value: statsToShow.day },
+                { title: "This Month", value: statsToShow.month },
+                { title: "This Year", value: statsToShow.year },
+                { title: "Total", value: statsToShow.total },
+              ].map((item, index) => (
+                <Col xs={24} sm={12} md={6} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card style={cardStyle}>
+                      <Statistic
+                        title={item.title}
+                        value={item.value}
+                        prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                      />
+                    </Card>
+                  </motion.div>
+                </Col>
+              ))}
+        </AnimatePresence>
       </Row>
 
       <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
@@ -215,16 +254,17 @@ const Dashboard = () => {
           loading={loading}
           disabled={loading}
         >
-          Thống kê
+          Statistics
         </Button>
       </div>
 
       <Tabs
-        defaultActiveKey="chart"
+        activeKey={activeTab}
+        onChange={(key) => setActiveTab(key)}
         items={[
           {
             key: 'chart',
-            label: '📈 Biểu đồ số câu hỏi',
+            label: '📈 Question Chart',
             children: (
               <Card style={cardStyle}>
                 <ResponsiveContainer width="100%" height={300}>
@@ -257,7 +297,7 @@ const Dashboard = () => {
           },
           {
             key: 'top-users',
-            label: '👥 Top người dùng',
+            label: '👥 Top Users',
             children: (
               <Card style={cardStyle}>
                 <Table
