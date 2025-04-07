@@ -8,7 +8,6 @@ import {
   Table,
   Typography,
   DatePicker,
-  Button,
 } from 'antd';
 import axios from 'axios';
 import { FileTextOutlined } from '@ant-design/icons';
@@ -30,140 +29,168 @@ const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
-  const [defaultStats, setDefaultStats] = useState({
-    creation_stats: { day: 0, month: 0, year: 0, total: 0 },
-    question_stats: { day: 0, month: 0, year: 0, total: 0 },
-  });
-  const [statsToShow, setStatsToShow] = useState({
-    day: 0,
-    month: 0,
-    year: 0,
-    total: 0,
-  });
+  const [statsToShow, setStatsToShow] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
   const [range, setRange] = useState([null, null]);
   const [rangeStats, setRangeStats] = useState({ creation: 0, questions: 0 });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("chart");
+  const [balanceData, setBalanceData] = useState({
+    total_added: 0,
+    total_subtracted: 0,
+    net_change: 0,
+  });
+
+  const tokenToVND = (tokens) => Math.round((tokens * 125000) / 300);
 
   useEffect(() => {
-    const now = new Date();
-    const year = now.getFullYear();
-
-    const fetchDefaultStats = async () => {
-      try {
-        setLoading(true);
-        const globalStatsRes = await axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getGlobalStats?year=${year}`,
-          {
-            headers: { "API-Key": process.env.REACT_APP_API_KEY },
-          }
-        );
-        const questionStats = globalStatsRes.data.question_stats;
-        setDefaultStats(globalStatsRes.data);
-        setStatsToShow({
-          day: questionStats.day,
-          month: questionStats.month,
-          year: questionStats.year,
-          total: questionStats.total,
-        });
-
-        const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
-        const today = dayjs().format('YYYY-MM-DD');
-        const rangeStatsRes = await axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${startOfMonth}&end=${today}`,
-          {
-            headers: { "API-Key": process.env.REACT_APP_API_KEY },
-          }
-        );
-        setRangeStats({
-          creation: rangeStatsRes.data.creation_stats.total,
-          questions: rangeStatsRes.data.question_stats.total,
-        });
-      } catch (error) {
-        console.error("Error fetching default stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchTopUsers = async () => {
-      try {
-        const res = await axios.get(
-          'http://127.0.0.1:8000/QuestionStats/getAllUserStats',
-          {
-            headers: { "API-Key": process.env.REACT_APP_API_KEY },
-          }
-        );
-        const sorted = res.data
-          .sort((a, b) => b.total_questions - a.total_questions)
-          .slice(0, 10);
-        setTopUsers(sorted);
-      } catch (error) {
-        console.error("Error fetching top users:", error);
-      }
-    };
-
     fetchDefaultStats();
     fetchTopUsers();
   }, []);
-
-  const fetchStatsInRange = async () => {
-    if (loading) return;
-    setLoading(true);
+  const fetchTopUsers = async () => {
     try {
-      if (range[0] && range[1]) {
-        const start = dayjs(range[0]).format('YYYY-MM-DD');
-        const end = dayjs(range[1]).format('YYYY-MM-DD');
-
-        const res = await axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${start}&end=${end}`,
-          {
-            headers: { "API-Key": process.env.REACT_APP_API_KEY },
-          }
-        );
-
-        const newStats = {
-          month: res.data.question_stats.total,
-          year: res.data.question_stats.total,
-        };
-
-        setRangeStats({
-          creation: res.data.creation_stats.total,
-          questions: res.data.question_stats.total,
-        });
-
-        setStatsToShow((prev) =>
-          prev.month === newStats.month && prev.year === newStats.year
-            ? prev
-            : { ...prev, ...newStats }
-        );
-      } else {
-        const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
-        const today = dayjs().format('YYYY-MM-DD');
-        const res = await axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${startOfMonth}&end=${today}`,
-          {
-            headers: { "API-Key": process.env.REACT_APP_API_KEY },
-          }
-        );
-        setRangeStats({
-          creation: res.data.creation_stats.total,
-          questions: res.data.question_stats.total,
-        });
-
-        setStatsToShow((prev) => ({
-          ...prev,
-          month: defaultStats.question_stats.month,
-          year: defaultStats.question_stats.year,
-        }));
-      }
+      const res = await axios.get(
+        'http://127.0.0.1:8000/QuestionStats/getAllUserStats',
+        {
+          headers: { "API-Key": process.env.REACT_APP_API_KEY },
+        }
+      );
+      const sorted = res.data
+        .sort((a, b) => b.total_questions - a.total_questions)
+        .slice(0, 10);
+      setTopUsers(sorted);
     } catch (error) {
-      console.error("Error fetching stats in range:", error);
+      console.error("Error fetching top users:", error);
+    }
+  };
+
+  const fetchDefaultStats = async () => {
+    try {
+      const now = new Date();
+      const year = now.getFullYear();
+      setLoading(true);
+      const globalStatsRes = await axios.get(
+        `http://127.0.0.1:8000/QuestionStats/getGlobalStats?year=${year}`,
+        {
+          headers: { "API-Key": process.env.REACT_APP_API_KEY },
+        }
+      );
+      const questionStats = globalStatsRes.data.question_stats;
+      setStatsToShow({
+        day: questionStats.day,
+        month: questionStats.month,
+        year: questionStats.year,
+        total: questionStats.total,
+      });
+
+      const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
+      const today = dayjs().format('YYYY-MM-DD');
+      const rangeStatsRes = await axios.get(
+        `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${startOfMonth}&end=${today}`,
+        {
+          headers: { "API-Key": process.env.REACT_APP_API_KEY },
+        }
+      );
+      setRangeStats({
+        creation: rangeStatsRes.data.creation_stats.total,
+        questions: rangeStatsRes.data.question_stats.total,
+      });
+    } catch (error) {
+      console.error("Error fetching default stats:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchBalanceData = async () => {
+      try {
+        let url = "http://127.0.0.1:8000/QuestionStats/getBalanceBreakdown";
+    
+        const isValidRange =
+          Array.isArray(range) &&
+          range[0] &&
+          range[1] &&
+          dayjs.isDayjs(range[0]) &&
+          dayjs.isDayjs(range[1]);
+    
+        if (isValidRange) {
+          const start = range[0].format("YYYY-MM-DD");
+          const end = range[1].format("YYYY-MM-DD");
+          url += `?start=${start}&end=${end}`;
+        }
+    
+        const res = await axios.get(url, {
+          headers: { "API-Key": process.env.REACT_APP_API_KEY },
+        });
+    
+        const data = res.data ?? {};
+    
+        setBalanceData({
+          total_added: Number(data.total_added ?? 0),
+          total_subtracted: Number(data.total_subtracted ?? 0),
+          net_change: Number(data.net_change ?? 0),
+        });
+      } catch (error) {
+        console.error("❌ Error fetching balance breakdown:", error);
+        if (error.response) {
+          console.error("➡ Response:", error.response.data);
+        }
+      }
+    };    
+    
+
+    if (activeTab === 'balance') {
+      fetchBalanceData();
+    }
+  }, [activeTab, range]);
+
+  const fetchStatsInRange = async (val) => {
+    if (!val || !val[0] || !val[1]) return;
+  
+    if (loading) return;
+    setLoading(true);
+  
+    try {
+      const start = dayjs(val[0]).format("YYYY-MM-DD");
+      const end = dayjs(val[1]).format("YYYY-MM-DD");
+  
+      const [statsRes, usersRes] = await Promise.all([
+        axios.get(
+          `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${start}&end=${end}`,
+          { headers: { "API-Key": process.env.REACT_APP_API_KEY } }
+        ),
+        axios.get(
+          `http://127.0.0.1:8000/QuestionStats/getUserStatsInRange?start=${start}&end=${end}`,
+          { headers: { "API-Key": process.env.REACT_APP_API_KEY } }
+        ),
+      ]);
+  
+      const stats = statsRes.data;
+      const sortedUsers = usersRes.data
+        .sort((a, b) => b.total_questions - a.total_questions)
+        .slice(0, 10);
+  
+      setRangeStats({
+        creation: stats.creation_stats.total,
+        questions: stats.question_stats.total,
+      });
+  
+      setStatsToShow((prev) => ({
+        ...prev,
+        month: stats.question_stats.total,
+        year: stats.question_stats.total,
+      }));
+  
+      setTopUsers(sortedUsers);
+    } catch (error) {
+      console.error("Error fetching stats or top users in range:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
 
   const chartData = [
     { name: 'Created Times', value: rangeStats.creation },
@@ -190,72 +217,132 @@ const Dashboard = () => {
 
       <Row gutter={[24, 24]}>
         <AnimatePresence>
-          {activeTab === 'top-users'
-            ? topUsers.slice(0, 4).map((user, index) => (
-                <Col xs={24} sm={12} md={6} key={user.idUser}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card style={cardStyle}>
-                      <Statistic
-                        title={`User ID: ${user.idUser}`}
-                        value={user.total_questions}
-                        suffix="questions"
-                        prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
-                      />
-                      <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
-                        {user.email}
-                      </div>
-                      <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
-                        Top {index + 1} User
-                      </div>
-                    </Card>
-                  </motion.div>
-                </Col>
-              ))
-            : [
-                { title: "Questions Today", value: statsToShow.day },
-                { title: "This Month", value: statsToShow.month },
-                { title: "This Year", value: statsToShow.year },
-                { title: "Total", value: statsToShow.total },
-              ].map((item, index) => (
-                <Col xs={24} sm={12} md={6} key={index}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Card style={cardStyle}>
-                      <Statistic
-                        title={item.title}
-                        value={item.value}
-                        prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
-                      />
-                    </Card>
-                  </motion.div>
-                </Col>
-              ))}
+          {activeTab === 'balance' ? (
+            [
+              {
+                title: 'Tổng nạp (VND)',
+                value: tokenToVND(balanceData.total_added),
+                color: '#52c41a',
+              },
+              {
+                title: 'Tổng trừ (VND)',
+                value: tokenToVND(Math.abs(balanceData.total_subtracted)),
+                color: '#f5222d',
+              },
+              {
+                title: 'Chênh lệch (VND)',
+                value: tokenToVND(balanceData.net_change),
+                color:
+                  balanceData.net_change > 0
+                    ? '#52c41a'
+                    : balanceData.net_change < 0
+                    ? '#f5222d'
+                    : '#999',
+              },
+            ].map((item, index) => (
+              <Col xs={24} sm={12} md={8} key={index}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card style={cardStyle}>
+                    <Statistic
+                      title={item.title}
+                      value={item.value.toLocaleString("vi-VN")}
+                      suffix="₫"
+                      valueStyle={{ color: item.color }}
+                    />
+                  </Card>
+                </motion.div>
+              </Col>
+            ))
+          ) : activeTab === 'top-users' ? (
+            topUsers.slice(0, 4).map((user, index) => (
+              <Col xs={24} sm={12} md={6} key={user.idUser}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card style={cardStyle}>
+                    <Statistic
+                      title={`User ID: ${user.idUser}`}
+                      value={user.total_questions}
+                      suffix="questions"
+                      prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                    />
+                    <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+                      {user.email}
+                    </div>
+                    <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>
+                      Top {index + 1} User
+                    </div>
+                  </Card>
+                </motion.div>
+              </Col>
+            ))
+          ) : (
+            statsToShow && [
+              { title: "Questions Today", value: statsToShow.day },
+              { title: "This Month", value: statsToShow.month },
+              { title: "This Year", value: statsToShow.year },
+              { title: "Total", value: statsToShow.total },
+            ].map((item, index) => (
+              <Col xs={24} sm={12} md={6} key={index}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card style={cardStyle}>
+                    <Statistic
+                      title={item.title}
+                      value={item.value}
+                      prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                    />
+                  </Card>
+                </motion.div>
+              </Col>
+            ))
+          )}
         </AnimatePresence>
       </Row>
 
+      {activeTab === 'balance' && (
+        <div style={{ textAlign: 'right', fontStyle: 'italic', color: '#888', marginTop: 8 }}>
+          {Array.isArray(range) && range[0] && range[1]
+            ? `📅 Từ ${dayjs(range[0]).format('DD/MM/YYYY')} đến ${dayjs(range[1]).format('DD/MM/YYYY')}`
+            : '📅 Thống kê toàn thời gian'}
+        </div>
+      )}
+
       <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-        <RangePicker
-          format="YYYY-MM-DD"
-          value={range}
-          onChange={(val) => setRange(val)}
-        />
-        <Button
-          type="primary"
-          onClick={fetchStatsInRange}
-          loading={loading}
-          disabled={loading}
-        >
-          Statistics
-        </Button>
+      <RangePicker
+        format="YYYY-MM-DD"
+        value={range}
+        onChange={(val) => {
+          setRange(val);
+
+          // Nếu người dùng xóa ngày đã chọn
+          if (!val || !val[0] || !val[1]) {
+            fetchDefaultStats();
+            fetchTopUsers();
+            return;
+          }
+
+          // Nếu chọn đủ 2 ngày, gọi fetch theo khoảng
+          fetchStatsInRange(val);
+        }}
+        showTime={false}
+        allowClear // Cho phép xóa ngày
+        panelRender={(panelNode) => <div style={{ maxWidth: 280 }}>{panelNode}</div>}
+      />
+
+
       </div>
 
       <Tabs
@@ -309,6 +396,47 @@ const Dashboard = () => {
               </Card>
             ),
           },
+          {
+            key: 'balance',
+            label: '💰 Balance',
+            children: (
+              <Card style={cardStyle}>
+                <Row gutter={[24, 24]}>
+                  <Col xs={24} sm={8}>
+                    <Statistic
+                      title="Total Added"
+                      value={balanceData.total_added}
+                      precision={0}
+                      valueStyle={{ color: '#52c41a' }}
+                    />
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Statistic
+                      title="Total Subtracted"
+                      value={Math.abs(balanceData.total_subtracted)}
+                      precision={0}
+                      valueStyle={{ color: '#f5222d' }}
+                    />
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Statistic
+                      title="Net Change"
+                      value={balanceData.net_change}
+                      precision={0}
+                      valueStyle={{
+                        color:
+                          balanceData.net_change > 0
+                            ? '#52c41a'
+                            : balanceData.net_change < 0
+                            ? '#f5222d'
+                            : '#999',
+                      }}
+                    />
+                  </Col>
+                </Row>
+              </Card>
+            ),
+          }
         ]}
       />
     </div>

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 import pymysql
+from typing import Optional
 from datetime import date
 from app.models.statistics import UserQuestionStats, GlobalStats, PeriodStats
 from app.utils.mysql_connection import get_db
@@ -29,6 +30,44 @@ def get_all_user_stats(
         JOIN users u ON qh.idUser = u.idUser
         GROUP BY qh.idUser, u.email
         """
+    )
+    rows = cursor.fetchall()
+    return [
+        UserQuestionStats(
+            idUser=row[0],
+            email=row[1],
+            create_count=row[2],
+            total_questions=row[3],
+        )
+        for row in rows
+    ]
+
+
+@router.get(
+    "/getUserStatsInRange",
+    response_model=list[UserQuestionStats],
+    summary="Thống kê top user trong khoảng thời gian",
+)
+def get_user_stats_in_range(
+    start: str,
+    end: str,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        SELECT
+            qh.idUser,
+            u.email,
+            COUNT(*) AS create_count,
+            COALESCE(SUM(qh.num_questions), 0) AS total_questions
+        FROM question_history qh
+        JOIN users u ON qh.idUser = u.idUser
+        WHERE DATE(qh.created_at) BETWEEN %s AND %s
+        GROUP BY qh.idUser, u.email
+        """,
+        (start, end),
     )
     rows = cursor.fetchall()
     return [
@@ -75,6 +114,57 @@ def get_stats_in_range(
         total=question_sum,
     )
     return GlobalStats(creation_stats=stats, question_stats=questions)
+
+
+@router.get(
+    "/getBalanceBreakdown", summary="Tổng nạp và trừ token trong khoảng thời gian"
+)
+def get_balance_breakdown(
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+
+    if start and end:
+        cursor.execute(
+            """
+            SELECT
+              COALESCE(SUM(CASE WHEN change_amount > 0 THEN change_amount ELSE 0 END), 0) AS total_added,
+              COALESCE(SUM(CASE WHEN change_amount < 0 THEN change_amount ELSE 0 END), 0) AS total_subtracted
+            FROM transactions
+            WHERE DATE(timestamp) BETWEEN %s AND %s
+            """,
+            (start, end),
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT
+              COALESCE(SUM(CASE WHEN change_amount > 0 THEN change_amount ELSE 0 END), 0) AS total_added,
+              COALESCE(SUM(CASE WHEN change_amount < 0 THEN change_amount ELSE 0 END), 0) AS total_subtracted
+            FROM transactions
+            """
+        )
+
+    result = cursor.fetchone()
+
+    if result is None:
+        added = 0
+        subtracted = 0
+    else:
+        added = float(result[0] or 0)
+        subtracted = float(result[1] or 0)
+
+    added = int(added) if added.is_integer() else added
+    subtracted = int(subtracted) if subtracted.is_integer() else subtracted
+
+    return {
+        "total_added": added,
+        "total_subtracted": subtracted,
+        "net_change": added + subtracted,
+    }
 
 
 @router.get(
