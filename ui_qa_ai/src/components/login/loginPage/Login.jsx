@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import lockIcon from '../../assets/images/lock-icon.png';
-import userIcon from '../../assets/images/user-icon.png';
+import lockIcon from '../../../assets/images/lock-icon.png';
+import userIcon from '../../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
-import './styleauth/Login.css';
+import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(''); // reset lỗi cũ
+    setError('');
     try {
       const response = await axios.post(
         'http://127.0.0.1:8000/authentication/login',
@@ -27,7 +27,7 @@ const Login = () => {
         }
       );
   
-      const { access_token, role, balance } = response.data;
+      const { access_token, role, balance, idUser  } = response.data;
   
       // 👇 Chặn user nếu hết token
       if (role === 'user' && (balance === null || balance <= 0)) {
@@ -38,6 +38,10 @@ const Login = () => {
   
       localStorage.setItem('token', access_token);
       localStorage.setItem('role', role);
+      localStorage.setItem('email', email);
+      localStorage.setItem('balance', balance);
+      localStorage.setItem('idUser', idUser);
+
   
       toast.success('Đăng nhập thành công!', {
         position: 'top-right',

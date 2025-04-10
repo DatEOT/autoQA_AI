@@ -97,4 +97,5 @@ async def login(
         "token_type": "bearer",
         "role": role,
         "balance": balance,
+        "idUser": db_user[0],
     }

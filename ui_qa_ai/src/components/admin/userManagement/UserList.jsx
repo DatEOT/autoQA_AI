@@ -13,7 +13,7 @@ import {
   MinusOutlined,
 } from '@ant-design/icons';
 import 'react-toastify/dist/ReactToastify.css';
-import './styleadmin/UserList.css';
+import './UserList.css';
 
 const UserList = () => {
   const [searchEmail, setSearchEmail] = useState('');

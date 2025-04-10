@@ -1,6 +1,6 @@
 import React from 'react';
-import './stylehome/HomeHero.css';
-import cardImage from '../../assets/images/imgdemo.jpg';
+import './HomeHero.css';
+import cardImage from '../../../assets/images/imgdemo.jpg';
 
 function HomeHero() {
   return (

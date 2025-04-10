@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import "../home/stylehome/HomeHeader.css"
+import "./HomeHeader.css"
 function HomeHeader() {
   return (
     <header className="bg-dark bg-opacity-75 backdrop-blur sticky-top py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
@@ -10,6 +10,9 @@ function HomeHeader() {
       </div>
       <nav>
         <ul className="nav">
+        <li className="nav-item">
+            <Link to="/rechargepage" className="nav-link text-white">Recharge</Link>
+          </li>
           <li className="nav-item">
             <a href="#product" className="nav-link text-white">Product</a>
           </li>

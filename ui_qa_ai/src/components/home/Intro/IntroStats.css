@@ -1,0 +1,31 @@
+.intro-section {
+    background-color: #fdf9f7;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .intro-section h2 {
+    color: #222;
+    font-size: 1.8rem;
+  }
+  
+  .intro-section p {
+    font-size: 1.1rem;
+    color: #555;
+  }
+  
+  .stats-section {
+    background-color: #fffefb;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .stats-section h3 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stats-section p {
+    font-size: 1rem;
+    color: #666;
+  }
+  

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './components/login/Login';
-import Register from './components/login/Register';
+import Login from './components/login/loginPage/Login';
+import Register from './components/login/RegisterPage/Register';
 import QuestionGenerator from './components/UI/QuestionGenerator';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
@@ -9,11 +9,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@coreui/coreui/dist/css/coreui.min.css';
 import HomeDashboard from './components/home/HomeDashboard';
-import AdminLayout from './components/admin/AdminLayout';
-import UserList from './components/admin/UserList';
-import DashboardAdmin from './components/admin/DashboardAdmin';
-import TransactionHistory from './components/admin/TransactionHistory';
-import AdminBlogManager from './components/admin/AdminBlogManager';
+import MainLayout from './components/sidebar/MainLayout';
+import UserList from './components/admin/userManagement/UserList';
+import DashboardAdmin from './components/admin/statistics/DashboardAdmin';
+import TransactionHistory from './components/admin/Transaction/TransactionHistory';
+import AdminBlogManager from './components/admin/blog/AdminBlogManager';
+import RechargePage from './components/home/RechargePage';
+import ChangePassword from './components/UI/ChangePassword ';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -34,22 +36,28 @@ const App = () => {
           theme="light"
         />
 
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/questiongenerator" element={<QuestionGenerator />} />
-          <Route path="/homedashboard" element={<HomeDashboard />} />
-          <Route path="/" element={<HomeDashboard />} />
+          <Routes>
+            {/* Các route không cần sidebar */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/homedashboard" element={<HomeDashboard />} />
+            <Route path="/rechargepage" element={<RechargePage />} />
+            <Route path="/" element={<HomeDashboard />} />
 
-          {/* ADMIN NESTED ROUTES */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="dashboardadmin" element={<DashboardAdmin />} />
-            <Route path="userlist" element={<UserList />} />
-            <Route path="transactionhistory" element={<TransactionHistory />} />
-            <Route path="adminblogmanager" element={<AdminBlogManager />} />
-            <Route path="settings" element={<div>Settings content</div>} />
-          </Route>
-        </Routes>
+            {/* Các route dùng chung layout có sidebar */}
+            <Route path="/" element={<MainLayout />}>
+              {/* USER ROUTES */}
+              <Route path="questiongenerator" element={<QuestionGenerator />} />
+              <Route path="/changepassword" element={<ChangePassword />} />
+
+              {/* ADMIN ROUTES */}
+              <Route path="admin/dashboardadmin" element={<DashboardAdmin />} />
+              <Route path="admin/userlist" element={<UserList />} />
+              <Route path="admin/transactionhistory" element={<TransactionHistory />} />
+              <Route path="admin/adminblogmanager" element={<AdminBlogManager />} />
+              <Route path="admin/settings" element={<div>Settings content</div>} />
+            </Route>
+          </Routes>
       </div>
     </Router>
   );

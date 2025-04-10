@@ -105,7 +105,7 @@ const DownloadSection = ({ results }) => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        Tải file ZIP chứa Word
+        Tải file ZIP
       </Button>
       </div>
     </div>
@@ -297,11 +297,14 @@ const QuestionGenerator = () => {
 
       <UploadSection onFileSelect={setFile} />
       <TotalQuestions totalQuestions={totalQuestions} setTotalQuestions={setTotalQuestions} />
-      <h3>Cấp độ Bloom:</h3>
-      <BloomLevels totalQuestions={totalQuestions} onSumChange={setBloomSum} />
-      <p className="bloom-sum">
+      <div className="bloom-section">
+        <h3>Cấp độ Bloom</h3>
+        <BloomLevels totalQuestions={totalQuestions} onSumChange={setBloomSum} />
+        <p className="bloom-sum">
         Tổng số câu hỏi đã chọn: {bloomSum} / {totalQuestions}
       </p>
+      </div>
+      
       <div className="generate-button">
         <GenerateButton onClick={handleGenerateQuestions} loading={loading} />
       </div>

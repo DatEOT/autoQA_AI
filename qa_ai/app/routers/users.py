@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form
 import pymysql
 from app.models.user import User, UserCreate
 from app.utils.mysql_connection import get_db
-from app.security.auth import hash_password
+from app.security.auth import hash_password, verify_password
 from decimal import Decimal
 from app.security.security import get_api_key
 from datetime import datetime
@@ -182,3 +182,34 @@ def delete_user(
     cursor.execute("DELETE FROM users WHERE idUser = %s", (user_id,))
     db.commit()
     return {"message": "User deleted successfully"}
+
+
+@router.put("/changePassword", response_model=dict)
+def change_password(
+    user_id: int = Form(...),
+    old_password: str = Form(...),
+    new_password: str = Form(...),
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+
+    # Lấy mật khẩu cũ từ DB
+    cursor.execute("SELECT password FROM users WHERE idUser = %s", (user_id,))
+    row = cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Kiểm tra mật khẩu cũ có đúng không
+    if not verify_password(old_password, row[0]):
+        raise HTTPException(status_code=400, detail="Mật khẩu cũ không đúng")
+
+    # Cập nhật mật khẩu mới (đã mã hóa)
+    hashed_new_password = hash_password(new_password)
+    cursor.execute(
+        "UPDATE users SET password = %s WHERE idUser = %s",
+        (hashed_new_password, user_id),
+    )
+    db.commit()
+
+    return {"message": "Đổi mật khẩu thành công"}

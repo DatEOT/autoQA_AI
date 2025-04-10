@@ -1,5 +1,5 @@
 import React from 'react';
-import './stylehome/Policy.css';
+import './Policy.css';
 
 function Policy() {
   return (

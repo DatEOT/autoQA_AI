@@ -5,7 +5,7 @@
 }
 
 .nav-link:hover {
-  color: #00ddeb !important;
+  color: #ef7920 !important;
 }
 
 .nav-link::after {
@@ -13,7 +13,7 @@
   position: absolute;
   width: 0;
   height: 2px;
-  background-color: #00ddeb;
+  background-color: #ef7920;
   bottom: 0;
   left: 0;
   transition: width 0.3s ease;
@@ -25,6 +25,6 @@
 
 /* Nút LOGIN */
 .btn-outline-light:hover {
-  background-color: white !important;
-  color: #1a2a44 !important;
+  background-color: #EF7920 !important;
+  color: #fff !important;
 }

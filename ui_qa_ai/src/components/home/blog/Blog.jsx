@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Slider from 'react-slick';
-import '../home/stylehome/Blog.css';
+import './Blog.css';
 
 function Blog() {
   const [blogs, setBlogs] = useState([]);
@@ -68,26 +68,29 @@ function Blog() {
 
 function BlogCard({ blog }) {
   return (
-    <div className="card h-100 mx-2 shadow-sm">
+    <div className="card quill-card mx-2 h-100 shadow">
       {blog.image_url && (
         <img
           src={blog.image_url}
-          className="card-img-top"
+          className="card-img-top rounded-top"
           alt={blog.title}
           style={{ height: '180px', objectFit: 'cover' }}
         />
       )}
       <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{blog.title}</h5>
-        <p className="card-text" style={{ flexGrow: 1 }}>
+        <h5 className="fw-bold mb-2 text-dark">{blog.title}</h5>
+        <p className="text-secondary mb-3" style={{ flexGrow: 1 }}>
           {blog.content.length > 100
-            ? blog.content.slice(0, 100) + "..."
+            ? blog.content.slice(0, 100) + '...'
             : blog.content}
         </p>
-        <a href={`/blog/${blog.id}`} className="custom-btn mt-auto">Đọc thêm</a>
+        <a href={`/blog/${blog.id}`} className="custom-btn mt-auto align-self-start">
+          Đọc thêm
+        </a>
       </div>
     </div>
   );
 }
+
 
 export default Blog;

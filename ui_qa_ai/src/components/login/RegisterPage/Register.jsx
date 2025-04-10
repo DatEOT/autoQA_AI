@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import lockIcon from '../../assets/images/lock-icon.png';
-import userIcon from '../../assets/images/user-icon.png';
+import lockIcon from '../../../assets/images/lock-icon.png';
+import userIcon from '../../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
 
 const Register = () => {
