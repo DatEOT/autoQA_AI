@@ -44,8 +44,8 @@ client = openai.OpenAI(
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 # Cấu hình thư mục
-UPLOAD_DIR = Path("qa_ai/uploads")
-TXT_DIR = Path("qa_ai/txt")
+UPLOAD_DIR = Path("uploads")
+TXT_DIR = Path("txt")
 
 # Đảm bảo thư mục tồn tại
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/login/loginPage/Login';
 import Register from './components/login/RegisterPage/Register';
-import QuestionGenerator from './components/UI/QuestionGenerator';
+import QuestionGenerator from './components/user/QuestionGeneratorPage/QuestionGenerator';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
 import { ToastContainer } from 'react-toastify';
@@ -15,7 +15,7 @@ import DashboardAdmin from './components/admin/statistics/DashboardAdmin';
 import TransactionHistory from './components/admin/Transaction/TransactionHistory';
 import AdminBlogManager from './components/admin/blog/AdminBlogManager';
 import RechargePage from './components/home/RechargePage';
-import ChangePassword from './components/UI/ChangePassword ';
+import ChangePassword from './components/user/ChangePasswordPage/ChangePassword ';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 

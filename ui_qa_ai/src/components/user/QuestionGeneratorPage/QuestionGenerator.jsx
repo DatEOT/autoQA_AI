@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import './styleui/QuestionGenerator.css';
+import './QuestionGenerator.css';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 const BloomLevels = ({ totalQuestions, onSumChange }) => {
@@ -201,12 +200,6 @@ const QuestionGenerator = () => {
   const [bloomSum, setBloomSum] = useState(0);
   const [examSubject, setExamSubject] = useState('');
   const [examDuration, setExamDuration] = useState('');
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/homedashboard');
-  };
 
   const handleGenerateQuestions = async () => {
     if (!file) {
@@ -279,12 +272,6 @@ const QuestionGenerator = () => {
 
   return (
     <div className="container">
-      <div className="dashboard-header">
-        <button className="logout-button" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt"></i> Đăng xuất
-        </button>
-      </div>
-
       <h1>Tạo Câu Hỏi Tự Luận từ File DOCX, PDF, TXT</h1>
       
       {/* Phần nhập thông tin môn thi và thời gian thi */}

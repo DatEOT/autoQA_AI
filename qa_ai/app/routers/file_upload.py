@@ -1,13 +1,23 @@
 from fastapi import APIRouter
-from fastapi import FastAPI, File, UploadFile, Header, HTTPException, Request, Form  # noqa: E402, F401
+from fastapi import (
+    FastAPI,
+    File,
+    UploadFile,
+    Header,
+    HTTPException,
+    Request,
+    Form,
+)  # noqa: E402, F401
 from fastapi.responses import FileResponse  # noqa: E402
 
 from uuid import uuid4
 
 from app.models.file_upload import FileUpload
 from app.security.security import get_api_key
+
 # from app.service.gmail import Gmail
 from app.config import settings
+
 # from app.models.mail import Mail
 
 
@@ -46,7 +56,7 @@ async def upload_file(
     """
     file_extension = os.path.splitext(file.filename)[1]
     unique_filename = f"{uuid4()}{file_extension}"
-    folder_path = os.path.join(os.path.join(settings.DIR_ROOT, "utils","download"))
+    folder_path = os.path.join(os.path.join(settings.DIR_ROOT, "utils", "download"))
     os.makedirs(folder_path) if not os.path.exists(folder_path) else folder_path
     file_path = os.path.join(folder_path, unique_filename)
 
@@ -78,7 +88,9 @@ async def download_file(filename: str):
     - Nếu tệp tồn tại, trả về tệp dưới dạng phản hồi tải xuống.
     - Nếu tệp không tồn tại, trả về lỗi 404 với thông báo "File not found".
     """
-    file_path = os.path.join(os.path.join(settings.DIR_ROOT, "utils","download"), filename)
+    file_path = os.path.join(
+        os.path.join(settings.DIR_ROOT, "utils", "download"), filename
+    )
     if os.path.exists(file_path):
         return FileResponse(
             path=file_path, filename=filename, media_type="application/octet-stream"
