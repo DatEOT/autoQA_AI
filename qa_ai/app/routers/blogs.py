@@ -134,7 +134,7 @@ def delete_blog(
     # 2. Xóa file ảnh nếu tồn tại
     image_url = blog["image_url"]
     if image_url:
-        image_path = image_url.lstrip("/")  # loại bỏ dấu / ở đầu /static/images/abc.jpg
+        image_path = image_url.lstrip("/")
         if os.path.exists(image_path):
             os.remove(image_path)
 

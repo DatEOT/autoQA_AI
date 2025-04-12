@@ -78,11 +78,11 @@ function BlogCard({ blog }) {
     >
       {blog.image_url && (
         <img
-          src={blog.image_url}
-          className="card-img-top rounded-top"
-          alt={blog.title}
-          style={{ height: '180px', objectFit: 'cover' }}
-        />
+        src={`http://127.0.0.1:8000${blog.image_url}`}
+        className="card-img-top rounded-top"
+        alt={blog.title}
+        style={{ height: '180px', objectFit: 'cover' }}
+      />
       )}
       <div className="card-body d-flex flex-column">
         <h5 className="fw-bold mb-2 text-dark">{blog.title}</h5>
