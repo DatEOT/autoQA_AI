@@ -1,20 +1,55 @@
 .policy-box {
-    background-color: white;
-    padding: 25px 30px;
-    border: 1px solid #eaeaea;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
-    transition: all 0.3s ease;
+  background-color: white;
+  padding: 25px 30px;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.policy-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+}
+
+.policy-box p {
+  color: #444;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Modal */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.custom-modal {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .policy-box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .policy-box p {
-    color: #444;
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-  
+}

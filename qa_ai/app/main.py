@@ -10,9 +10,15 @@ from app.routers import (
     transaction_history,
     blogs,
 )
+from fastapi.staticfiles import StaticFiles
+
 
 # Tạo instance FastAPI
 app = FastAPI()
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 # Cấu hình CORS
 app.add_middleware(

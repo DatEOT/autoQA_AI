@@ -230,3 +230,17 @@ def get_global_stats(
     )
 
     return GlobalStats(creation_stats=creation_stats, question_stats=question_stats)
+
+
+@router.get(
+    "/getTotalQuestions",
+    summary="Lấy tổng số câu hỏi đã được tạo",
+)
+def get_total_questions(
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+    cursor.execute("SELECT COALESCE(SUM(num_questions), 0) FROM question_history")
+    total_questions = cursor.fetchone()[0]
+    return {"total_questions": total_questions}

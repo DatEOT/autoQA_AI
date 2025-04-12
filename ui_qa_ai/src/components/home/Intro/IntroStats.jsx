@@ -1,7 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './IntroStats.css';
 
 function IntroStats() {
+  const [totalQuestions, setTotalQuestions] = useState(null);
+  const [totalUsers, setTotalUsers] = useState(null);
+
+  useEffect(() => {
+    // Gọi API lấy tổng số câu hỏi
+    axios.get('http://127.0.0.1:8000/QuestionStats/getTotalQuestions', {
+      headers: {
+        'API-Key': process.env.REACT_APP_API_KEY,
+      },
+    })
+      .then((res) => {
+        setTotalQuestions(res.data.total_questions);
+      })
+      .catch((err) => console.error('Error fetching questions:', err));
+
+    axios.get('http://127.0.0.1:8000/Usermanagement/countUsers', {
+      headers: {
+        'API-Key': process.env.REACT_APP_API_KEY,
+      },
+    })
+      .then((res) => {
+        setTotalUsers(res.data.total_users);
+      })
+      .catch((err) => console.error('Error fetching users:', err));
+  }, []);
+
   return (
     <div className="intro-stats-wrapper">
       {/* PHẦN GIỚI THIỆU */}
@@ -22,11 +49,15 @@ function IntroStats() {
       <section className="stats-section py-4 text-center">
         <div className="container d-flex justify-content-around flex-wrap gap-4">
           <div>
-            <h3 className="fw-bold text-primary">12,000+</h3>
+            <h3 className="fw-bold text-primary">
+              {totalQuestions !== null ? totalQuestions.toLocaleString() : '...'}
+            </h3>
             <p className="text-muted">Câu hỏi đã tạo</p>
           </div>
           <div>
-            <h3 className="fw-bold text-primary">300+</h3>
+            <h3 className="fw-bold text-primary">
+              {totalUsers !== null ? totalUsers.toLocaleString() : '...'}
+            </h3>
             <p className="text-muted">Người dùng đang sử dụng</p>
           </div>
           <div>

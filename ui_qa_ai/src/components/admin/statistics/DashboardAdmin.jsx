@@ -56,7 +56,7 @@ const Dashboard = () => {
         }
       );
       const sorted = res.data
-        .sort((a, b) => b.total_questions - a.total_questions)
+        .sort((a, b) => b.create_count - a.create_count)
         .slice(0, 10);
       setTopUsers(sorted);
     } catch (error) {
@@ -168,7 +168,7 @@ const Dashboard = () => {
   
       const stats = statsRes.data;
       const sortedUsers = usersRes.data
-        .sort((a, b) => b.total_questions - a.total_questions)
+        .sort((a, b) => b.create_count - a.create_count)
         .slice(0, 10);
   
       setRangeStats({
@@ -270,8 +270,8 @@ const Dashboard = () => {
                   <Card style={cardStyle}>
                     <Statistic
                       title={`User ID: ${user.idUser}`}
-                      value={user.total_questions}
-                      suffix="questions"
+                      value={user.create_count}
+                      suffix="times"
                       prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
                     />
                     <div style={{ fontSize: 13, color: '#999', marginTop: 4 }}>

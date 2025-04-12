@@ -5,7 +5,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 function AdminBlogManager() {
   const [blogs, setBlogs] = useState([]);
-  const [formData, setFormData] = useState({ id: null, title: "", content: "", image_url: "" });
+  const [formData, setFormData] = useState({
+    id: null,
+    title: "",
+    content: "",
+    image_url: "",
+    image_file: null,
+  });
+
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -13,81 +20,100 @@ function AdminBlogManager() {
   }, []);
 
   const fetchBlogs = () => {
-    axios.get(`http://127.0.0.1:8000/blogs/ReadBlogAll`, {
-      headers: {
-        'API-Key': process.env.REACT_APP_API_KEY,
-      },
-    })
-      .then(res => setBlogs(res.data))
-      .catch(err => {
-        console.error("Lỗi khi tải danh sách blog:", err);
-        toast.error("Không thể tải danh sách blog!");
+    axios
+      .get(`http://127.0.0.1:8000/blogs/ReadBlogAll`, {
+        headers: {
+          "API-Key": process.env.REACT_APP_API_KEY,
+        },
+      })
+      .then((res) => setBlogs(res.data))
+      .catch((err) => {
+        console.error("Error fetching blog list:", err);
+        toast.error("Failed to load blog list!");
       });
   };
 
+  const handleFileChange = (e) => {
+    setFormData((prev) => ({ ...prev, image_file: e.target.files[0] }));
+  };
+
   const handleInputChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("content", formData.content);
+    if (formData.image_file) {
+      data.append("image", formData.image_file);
+    }
+
     const config = {
       headers: {
-        'API-Key': process.env.REACT_APP_API_KEY,
+        "API-Key": process.env.REACT_APP_API_KEY,
+        "Content-Type": "multipart/form-data",
       },
     };
 
-    if (isEditing) {
-      axios.put(`http://127.0.0.1:8000/blogs/UpdateBlog/${formData.id}`, formData, config)
-        .then(() => {
-          fetchBlogs();
-          resetForm();
-          toast.success("Cập nhật blog thành công!");
-        })
-        .catch(err => {
-          console.error("Lỗi khi cập nhật blog:", err);
-          toast.error("Cập nhật blog thất bại!");
-        });
-    } else {
-      axios.post(`http://127.0.0.1:8000/blogs/CreateBlog`, formData, config)
-        .then(() => {
-          fetchBlogs();
-          resetForm();
-          toast.success("Tạo blog thành công!");
-        })
-        .catch(err => {
-          console.error("Lỗi khi tạo blog:", err);
-          toast.error("Tạo blog thất bại!");
-        });
-    }
+    const url = isEditing
+      ? `http://127.0.0.1:8000/blogs/UpdateBlog/${formData.id}`
+      : `http://127.0.0.1:8000/blogs/CreateBlog`;
+
+    const method = isEditing ? axios.put : axios.post;
+
+    method(url, data, config)
+      .then(() => {
+        fetchBlogs();
+        resetForm();
+        toast.success(isEditing ? "Blog updated successfully!" : "Blog created successfully!");
+      })
+      .catch((err) => {
+        console.error("Error submitting blog:", err);
+        toast.error(isEditing ? "Failed to update blog!" : "Failed to create blog!");
+      });
   };
 
   const handleEdit = (blog) => {
-    setFormData(blog);
+    setFormData({
+      id: blog.id,
+      title: blog.title,
+      content: blog.content,
+      image_url: blog.image_url,
+      image_file: null,
+    });
     setIsEditing(true);
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa blog này?")) return;
+    if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
-    axios.delete(`http://127.0.0.1:8000/blogs/DeleteBlog/${id}`, {
-      headers: {
-        'API-Key': process.env.REACT_APP_API_KEY,
-      },
-    })
+    axios
+      .delete(`http://127.0.0.1:8000/blogs/DeleteBlog/${id}`, {
+        headers: {
+          "API-Key": process.env.REACT_APP_API_KEY,
+        },
+      })
       .then(() => {
         fetchBlogs();
-        toast.success("Xoá blog thành công!");
+        toast.success("Blog deleted successfully!");
       })
-      .catch(err => {
-        console.error("Lỗi khi xóa blog:", err);
-        toast.error("Xoá blog thất bại!");
+      .catch((err) => {
+        console.error("Error deleting blog:", err);
+        toast.error("Failed to delete blog!");
       });
   };
 
   const resetForm = () => {
-    setFormData({ id: null, title: "", content: "", image_url: "" });
+    setFormData({
+      id: null,
+      title: "",
+      content: "",
+      image_url: "",
+      image_file: null,
+    });
     setIsEditing(false);
   };
 
@@ -119,22 +145,21 @@ function AdminBlogManager() {
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Image URL (if any)</label>
+          <label className="form-label">Select image (optional)</label>
           <input
-            type="text"
+            type="file"
             className="form-control"
-            name="image_url"
-            value={formData.image_url}
-            onChange={handleInputChange}
+            accept="image/*"
+            onChange={handleFileChange}
           />
         </div>
 
         <button type="submit" className="btn btn-success me-2">
-          {isEditing ? "Cập nhật" : "Create"}
+          {isEditing ? "Update" : "Create"}
         </button>
         {isEditing && (
           <button type="button" className="btn btn-secondary" onClick={resetForm}>
-            Hủy
+            Cancel
           </button>
         )}
       </form>
@@ -158,9 +183,13 @@ function AdminBlogManager() {
                 <td>{blog.title}</td>
                 <td>
                   {blog.image_url ? (
-                    <img src={blog.image_url} alt="thumb" width="80" />
+                    <img
+                      src={`http://127.0.0.1:8000${blog.image_url}`}
+                      alt="thumb"
+                      width="80"
+                    />
                   ) : (
-                    "Không có"
+                    "None"
                   )}
                 </td>
                 <td>
@@ -169,10 +198,16 @@ function AdminBlogManager() {
                     : blog.content}
                 </td>
                 <td>
-                  <button className="btn btn-primary btn-sm me-2" onClick={() => handleEdit(blog)}>
+                  <button
+                    className="btn btn-primary btn-sm me-2"
+                    onClick={() => handleEdit(blog)}
+                  >
                     Edit
                   </button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(blog.id)}>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(blog.id)}
+                  >
                     Delete
                   </button>
                 </td>

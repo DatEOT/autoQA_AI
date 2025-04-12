@@ -213,3 +213,14 @@ def change_password(
     db.commit()
 
     return {"message": "Đổi mật khẩu thành công"}
+
+
+@router.get("/countUsers", response_model=dict)
+def count_users(
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor()
+    cursor.execute("SELECT COUNT(idUser) FROM users")
+    count = cursor.fetchone()[0]
+    return {"total_users": count}

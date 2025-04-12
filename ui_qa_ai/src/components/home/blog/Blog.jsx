@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Slider from 'react-slick';
+import { motion } from 'framer-motion';
 import './Blog.css';
 
 function Blog() {
@@ -68,7 +69,13 @@ function Blog() {
 
 function BlogCard({ blog }) {
   return (
-    <div className="card quill-card mx-2 h-100 shadow">
+    <motion.div
+      className="card quill-card mx-2 h-100 shadow"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      whileHover={{ scale: 1.03 }} // tăng nhẹ khi hover
+    >
       {blog.image_url && (
         <img
           src={blog.image_url}
@@ -88,7 +95,7 @@ function BlogCard({ blog }) {
           Đọc thêm
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
