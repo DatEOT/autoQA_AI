@@ -8,7 +8,7 @@ function Blog() {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/blogs/ReadBlogAll", {
+    axios.get(`${process.env.REACT_APP_API_URL}/blogs/ReadBlogAll`, {
       headers: {
         'API-Key': process.env.REACT_APP_API_KEY,
       },
@@ -78,7 +78,7 @@ function BlogCard({ blog }) {
     >
       {blog.image_url && (
         <img
-        src={`http://127.0.0.1:8000${blog.image_url}`}
+        src={`${process.env.REACT_APP_API_URL}${blog.image_url}`}
         className="card-img-top rounded-top"
         alt={blog.title}
         style={{ height: '180px', objectFit: 'cover' }}

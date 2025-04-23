@@ -21,7 +21,7 @@ function AdminBlogManager() {
 
   const fetchBlogs = () => {
     axios
-      .get(`http://127.0.0.1:8000/blogs/ReadBlogAll`, {
+      .get(`${process.env.REACT_APP_API_URL}/blogs/ReadBlogAll`, {
         headers: {
           "API-Key": process.env.REACT_APP_API_KEY,
         },
@@ -59,8 +59,8 @@ function AdminBlogManager() {
     };
 
     const url = isEditing
-      ? `http://127.0.0.1:8000/blogs/UpdateBlog/${formData.id}`
-      : `http://127.0.0.1:8000/blogs/CreateBlog`;
+      ? `${process.env.REACT_APP_API_URL}/blogs/UpdateBlog/${formData.id}`
+      : `${process.env.REACT_APP_API_URL}/blogs/CreateBlog`;
 
     const method = isEditing ? axios.put : axios.post;
 
@@ -91,7 +91,7 @@ function AdminBlogManager() {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
     axios
-      .delete(`http://127.0.0.1:8000/blogs/DeleteBlog/${id}`, {
+      .delete(`${process.env.REACT_APP_API_URL}/blogs/DeleteBlog/${id}`, {
         headers: {
           "API-Key": process.env.REACT_APP_API_KEY,
         },
@@ -184,7 +184,7 @@ function AdminBlogManager() {
                 <td>
                   {blog.image_url ? (
                     <img
-                      src={`http://127.0.0.1:8000${blog.image_url}`}
+                      src={`${process.env.REACT_APP_API_URL}${blog.image_url}`}
                       alt="thumb"
                       width="80"
                     />

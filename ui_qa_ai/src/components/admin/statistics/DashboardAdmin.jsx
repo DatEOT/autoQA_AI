@@ -50,7 +50,7 @@ const Dashboard = () => {
   const fetchTopUsers = async () => {
     try {
       const res = await axios.get(
-        'http://127.0.0.1:8000/QuestionStats/getAllUserStats',
+        `${process.env.REACT_APP_API_URL}/QuestionStats/getAllUserStats`,
         {
           headers: { "API-Key": process.env.REACT_APP_API_KEY },
         }
@@ -70,7 +70,7 @@ const Dashboard = () => {
       const year = now.getFullYear();
       setLoading(true);
       const globalStatsRes = await axios.get(
-        `http://127.0.0.1:8000/QuestionStats/getGlobalStats?year=${year}`,
+        `${process.env.REACT_APP_API_URL}/QuestionStats/getGlobalStats?year=${year}`,
         {
           headers: { "API-Key": process.env.REACT_APP_API_KEY },
         }
@@ -86,7 +86,7 @@ const Dashboard = () => {
       const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD');
       const today = dayjs().format('YYYY-MM-DD');
       const rangeStatsRes = await axios.get(
-        `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${startOfMonth}&end=${today}`,
+        `${process.env.REACT_APP_API_URL}/QuestionStats/getStatsInRange?start=${startOfMonth}&end=${today}`,
         {
           headers: { "API-Key": process.env.REACT_APP_API_KEY },
         }
@@ -105,7 +105,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBalanceData = async () => {
       try {
-        let url = "http://127.0.0.1:8000/QuestionStats/getBalanceBreakdown";
+        let url = `${process.env.REACT_APP_API_URL}/QuestionStats/getBalanceBreakdown`;
     
         const isValidRange =
           Array.isArray(range) &&
@@ -157,11 +157,11 @@ const Dashboard = () => {
   
       const [statsRes, usersRes] = await Promise.all([
         axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getStatsInRange?start=${start}&end=${end}`,
+          `${process.env.REACT_APP_API_URL}/QuestionStats/getStatsInRange?start=${start}&end=${end}`,
           { headers: { "API-Key": process.env.REACT_APP_API_KEY } }
         ),
         axios.get(
-          `http://127.0.0.1:8000/QuestionStats/getUserStatsInRange?start=${start}&end=${end}`,
+          `${process.env.REACT_APP_API_URL}/QuestionStats/getUserStatsInRange?start=${start}&end=${end}`,
           { headers: { "API-Key": process.env.REACT_APP_API_KEY } }
         ),
       ]);

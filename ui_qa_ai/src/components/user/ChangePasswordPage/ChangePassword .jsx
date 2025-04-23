@@ -35,7 +35,7 @@ const ChangePassword = () => {
       formData.append('new_password', newPassword);
 
       const response = await axios.put(
-        'http://127.0.0.1:8000/Usermanagement/changePassword',
+        `${process.env.REACT_APP_API_URL}/Usermanagement/changePassword`,
         formData,
         {
           headers: {

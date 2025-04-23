@@ -15,7 +15,7 @@ const TransactionHistory = () => {
 
   const fetchAllTransactions = () => {
     axios
-      .get("http://127.0.0.1:8000/transactionHistory/", {
+      .get(`${process.env.REACT_APP_API_URL}/transactionHistory/`, {
         headers: { "API-Key": process.env.REACT_APP_API_KEY },
       })
       .then((res) => {
@@ -38,7 +38,7 @@ const TransactionHistory = () => {
     if (email.trim()) {
       axios
         .get(
-          `http://127.0.0.1:8000/transactionHistory/by-email?email=${email}`,
+          `${process.env.REACT_APP_API_URL}/transactionHistory/by-email?email=${email}`,
           {
             headers: { "API-Key": process.env.REACT_APP_API_KEY },
           }
@@ -68,7 +68,7 @@ const TransactionHistory = () => {
 
       axios
         .get(
-          `http://127.0.0.1:8000/transactionHistory/by-date?${params.toString()}`,
+          `${process.env.REACT_APP_API_URL}/transactionHistory/by-date?${params.toString()}`,
           {
             headers: { "API-Key": process.env.REACT_APP_API_KEY },
           }

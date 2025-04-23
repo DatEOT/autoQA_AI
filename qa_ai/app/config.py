@@ -12,7 +12,12 @@ class Settings:
     DIR_ROOT = os.path.dirname(os.path.abspath(".env"))
     # API KEY
     API_KEY = os.environ["API_KEY"]
+
     KEY_API_GPT = os.environ["OPENAI_API_KEY"]
+
+    LLM_NAME = os.environ["LLM_NAME"]
+
+    OPENAI_LLM = os.environ["OPENAI_LLM"]
 
 
 settings = Settings()

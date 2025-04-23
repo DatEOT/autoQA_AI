@@ -9,6 +9,7 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
+  cilSettings,
   cilSpeedometer,
   cilUser,
   cilNotes,
@@ -61,6 +62,9 @@ const MainLayout = () => {
               </CNavItem>
               <CNavItem href="/admin/adminblogmanager" active={location.pathname === '/admin/adminblogmanager'}>
                 <CIcon customClassName="nav-icon" icon={cilNotes} /> Blog
+              </CNavItem>
+              <CNavItem href="/admin/config" active={location.pathname === '/admin/config'}>
+                <CIcon customClassName="nav-icon" icon={cilSettings} /> Config
               </CNavItem>
             </>
           ) : (

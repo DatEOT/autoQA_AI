@@ -1,10 +1,18 @@
 import pymysql
-from fastapi import Depends
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def get_db():
     db = pymysql.connect(
-        host="localhost", user="root", password="", database="qa_ai_db"
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT")),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        charset="utf8mb4",
     )
     try:
         yield db

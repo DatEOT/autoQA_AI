@@ -27,7 +27,7 @@ const UserList = () => {
 
   const fetchLastLogin = (userId) => {
     axios
-      .get(`http://127.0.0.1:8000/login_history/last_login/${userId}`, {
+      .get(`${process.env.REACT_APP_API_URL}/login_history/last_login/${userId}`, {
         headers: {
           'API-Key': process.env.REACT_APP_API_KEY,
           accept: 'application/json',
@@ -45,7 +45,7 @@ const UserList = () => {
 
   const fetchUsers = useCallback(() => {
     axios
-      .get('http://127.0.0.1:8000/Usermanagement/getUsers', {
+      .get(`${process.env.REACT_APP_API_URL}/Usermanagement/getUsers`, {
         headers: {
           'API-Key': process.env.REACT_APP_API_KEY,
           accept: 'application/json',
@@ -74,7 +74,7 @@ const UserList = () => {
     if (editingId) {
       axios
         .put(
-          `http://127.0.0.1:8000/Usermanagement/updateUser/${editingId}?role=${form.role}`,
+          `${process.env.REACT_APP_API_URL}/Usermanagement/updateUser/${editingId}?role=${form.role}`,
           {},
           {
             headers: {
@@ -95,7 +95,7 @@ const UserList = () => {
         });
     } else {
       axios
-        .post('http://127.0.0.1:8000/Usermanagement/createUser', form, {
+        .post(`${process.env.REACT_APP_API_URL}/Usermanagement/createUser`, form, {
           headers: {
             'API-Key': process.env.REACT_APP_API_KEY,
             accept: 'application/json',
@@ -133,7 +133,7 @@ const UserList = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://127.0.0.1:8000/Usermanagement/delete/${id}`, {
+          .delete(`${process.env.REACT_APP_API_URL}/Usermanagement/delete/${id}`, {
             headers: {
               'API-Key': process.env.REACT_APP_API_KEY,
               accept: 'application/json',
@@ -157,7 +157,7 @@ const UserList = () => {
     } else {
       const encodedEmail = encodeURIComponent(searchEmail);
       axios
-        .get(`http://127.0.0.1:8000/Usermanagement/getUserByEmail/${encodedEmail}`, {
+        .get(`${process.env.REACT_APP_API_URL}/Usermanagement/getUserByEmail/${encodedEmail}`, {
           headers: {
             'API-Key': process.env.REACT_APP_API_KEY,
             accept: 'application/json',
@@ -177,7 +177,7 @@ const UserList = () => {
   const toggleActive = (id, currentStatus) => {
     axios
       .put(
-        `http://127.0.0.1:8000/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
+        `${process.env.REACT_APP_API_URL}/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
         null,
         {
           headers: {
@@ -219,7 +219,7 @@ const UserList = () => {
 
         axios
           .put(
-            `http://127.0.0.1:8000/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
+            `${process.env.REACT_APP_API_URL}/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
             null,
             {
               headers: {

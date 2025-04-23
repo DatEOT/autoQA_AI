@@ -1,6 +1,6 @@
-docker build -t api_web_leech_truyen_audio .
+docker build -t qa_fastapi_app .
 
-docker run -d --restart always -v /root/dir*api_web_leech_truyen_audio:/\_app*/utils/download --name api_web_leech_truyen_audio -p 60074:60074 api_web_leech_truyen_audio
+docker run -d --restart always -p 55036:55036 --name qa_fastapi_container qa_fastapi_app
 
 docker save -o api_web_leech_truyen_audio.tar api_web_leech_truyen_audio
 
@@ -14,6 +14,3 @@ myproject_env\Scripts\activate
 pip freeze > requirements.txt
 
 Remove-Item -Path .git -Recurse -Force
-
-docker build -t react-app:dev .
-docker run -p 3000:3000 react-app:dev

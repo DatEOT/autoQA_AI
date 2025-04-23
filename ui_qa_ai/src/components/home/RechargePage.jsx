@@ -7,7 +7,6 @@ function RechargePage() {
 
   const handleConfirm = () => {
     setConfirmed(true);
-    // Sau này gọi API ghi log ở đây nếu muốn
   };
 
   return (

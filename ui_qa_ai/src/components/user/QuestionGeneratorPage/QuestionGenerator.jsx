@@ -81,7 +81,7 @@ const DownloadSection = ({ results }) => {
     );
   }
 
-  const zipUrl = `http://127.0.0.1:8000/questions/download/zip/${results.file_id}`;
+  const zipUrl = `${process.env.REACT_APP_API_URL}/questions/download/zip/${results.file_id}`;
   return (
     <div className="result-section">
       <h2>Tải xuống File Word (ZIP)</h2>
@@ -238,7 +238,7 @@ const QuestionGenerator = () => {
     formData.append('level_6', bloomLevels[5]?.value || 0);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/questions/generate', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/questions/generate`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'API-Key': process.env.REACT_APP_API_KEY,

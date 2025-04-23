@@ -8,7 +8,7 @@ function IntroStats() {
 
   useEffect(() => {
     // Gọi API lấy tổng số câu hỏi
-    axios.get('http://127.0.0.1:8000/QuestionStats/getTotalQuestions', {
+    axios.get(`${process.env.REACT_APP_API_URL}/QuestionStats/getTotalQuestions`, {
       headers: {
         'API-Key': process.env.REACT_APP_API_KEY,
       },
@@ -18,7 +18,7 @@ function IntroStats() {
       })
       .catch((err) => console.error('Error fetching questions:', err));
 
-    axios.get('http://127.0.0.1:8000/Usermanagement/countUsers', {
+    axios.get(`${process.env.REACT_APP_API_URL}/Usermanagement/countUsers`, {
       headers: {
         'API-Key': process.env.REACT_APP_API_KEY,
       },
