@@ -28,3 +28,15 @@
   background-color: #EF7920 !important;
   color: #fff !important;
 }
+
+/* Logo image styling */
+.header-logo {
+  height: 70px;
+  border-radius: 12px; /* Bo tròn góc */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+  transition: transform 0.3s ease;
+}
+
+.header-logo:hover {
+  transform: scale(1.05); /* Zoom nhẹ khi hover */
+}

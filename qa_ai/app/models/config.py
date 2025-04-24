@@ -7,7 +7,7 @@ class Config(BaseModel):
     websiteName: str
     websiteDescription: Optional[str] = None
     websiteKeywords: Optional[str] = None
-    logo: Optional[str] = None
+    logo: Optional[bytes] = None
     phoneNumber1: Optional[str] = None
     phoneNumber2: Optional[str] = None
     address: Optional[str] = None

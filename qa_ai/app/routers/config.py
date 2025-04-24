@@ -1,38 +1,122 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+import base64
 import pymysql
-from app.models.config import WebsiteUpdate, ContactUpdate, SocialMediaUpdate
+from app.models.config import Config, WebsiteUpdate, ContactUpdate, SocialMediaUpdate
+from typing import List
 from app.utils.mysql_connection import get_db
 from app.security.security import get_api_key
 
 router = APIRouter(prefix="/config", tags=["config"])
 
 
-@router.put("/website/{idConfig}", response_model=dict)
-def update_website(
+@router.get("/getAll/", response_model=List[Config])
+def get_all_config(
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("SELECT * FROM config")
+    result = cursor.fetchall()
+
+    for row in result:
+        if row.get("logo"):
+            row["logo"] = base64.b64encode(row["logo"]).decode("utf-8")
+
+    return result
+
+
+# Thêm endpoint GET cho website
+@router.get("/website/{idConfig}", response_model=dict)
+def get_website(
     idConfig: int,
-    update_data: WebsiteUpdate,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute(
+        "SELECT websiteName, websiteDescription, websiteKeywords, logo FROM config WHERE idConfig = %s",
+        (idConfig,),
+    )
+    result = cursor.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Config not found")
+
+    if result.get("logo"):
+        base64_logo = base64.b64encode(result["logo"]).decode("utf-8")
+        result["logo"] = f"data:image/jpeg;base64,{base64_logo}"
+
+    return result
+
+
+# Thêm endpoint GET cho contact
+@router.get("/contact/{idConfig}", response_model=dict)
+def get_contact(
+    idConfig: int,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute(
+        "SELECT phoneNumber1, phoneNumber2, address FROM config WHERE idConfig = %s",
+        (idConfig,),
+    )
+    result = cursor.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Config not found")
+    return result
+
+
+# Thêm endpoint GET cho social-media
+@router.get("/social-media/{idConfig}", response_model=dict)
+def get_social_media(
+    idConfig: int,
+    db: pymysql.connections.Connection = Depends(get_db),
+    api_key: str = get_api_key,
+):
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute(
+        "SELECT tiktok, facebook, zalo FROM config WHERE idConfig = %s", (idConfig,)
+    )
+    result = cursor.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="Config not found")
+    return result
+
+
+# Các endpoint PUT giữ nguyên
+@router.put("/website/{idConfig}", response_model=dict)
+async def update_website(
+    idConfig: int,
+    websiteName: str = Form(None),
+    websiteDescription: str = Form(None),
+    websiteKeywords: str = Form(None),
+    logo: UploadFile = File(None),
     db: pymysql.connections.Connection = Depends(get_db),
     api_key: str = get_api_key,
 ):
     cursor = db.cursor()
+
+    # Kiểm tra tồn tại
     cursor.execute("SELECT idConfig FROM config WHERE idConfig = %s", (idConfig,))
     if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Config not found")
 
     set_clauses = []
     values = []
-    if update_data.websiteName is not None:
+
+    if websiteName is not None:
         set_clauses.append("websiteName = %s")
-        values.append(update_data.websiteName)
-    if update_data.websiteDescription is not None:
+        values.append(websiteName)
+    if websiteDescription is not None:
         set_clauses.append("websiteDescription = %s")
-        values.append(update_data.websiteDescription)
-    if update_data.websiteKeywords is not None:
+        values.append(websiteDescription)
+    if websiteKeywords is not None:
         set_clauses.append("websiteKeywords = %s")
-        values.append(update_data.websiteKeywords)
-    if update_data.logo is not None:
+        values.append(websiteKeywords)
+    if logo is not None:
+        content = await logo.read()
         set_clauses.append("logo = %s")
-        values.append(update_data.logo)
+        values.append(content)
 
     if not set_clauses:
         raise HTTPException(status_code=400, detail="No fields provided for update")
@@ -43,8 +127,6 @@ def update_website(
     try:
         cursor.execute(query, values)
         db.commit()
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Config not found")
         return {"message": "Website configuration updated successfully"}
     except pymysql.err.Error as e:
         db.rollback()

@@ -12,6 +12,7 @@ import HomeDashboard from './components/home/HomeDashboard';
 import MainLayout from './components/sidebar/MainLayout';
 import UserList from './components/admin/userManagement/UserList';
 import DashboardAdmin from './components/admin/statistics/DashboardAdmin';
+import Config from './components/admin/config/Config';
 import TransactionHistory from './components/admin/Transaction/TransactionHistory';
 import AdminBlogManager from './components/admin/blog/AdminBlogManager';
 import RechargePage from './components/home/RechargePage';
@@ -55,7 +56,7 @@ const App = () => {
               <Route path="admin/userlist" element={<UserList />} />
               <Route path="admin/transactionhistory" element={<TransactionHistory />} />
               <Route path="admin/adminblogmanager" element={<AdminBlogManager />} />
-              <Route path="admin/settings" element={<div>Settings content</div>} />
+              <Route path="admin/config" element={<Config />} />
             </Route>
           </Routes>
       </div>

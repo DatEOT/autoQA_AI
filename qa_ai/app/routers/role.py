@@ -27,7 +27,8 @@ def get_users_by_role(
 ):
     cursor = db.cursor(pymysql.cursors.DictCursor)
     cursor.execute(
-        "SELECT idUser AS id, email, role FROM users WHERE role = %s", (role,)
+        "SELECT idUser AS id, email, role, is_active, balance FROM users WHERE role = %s",
+        (role,),
     )
     users = cursor.fetchall()
     return users

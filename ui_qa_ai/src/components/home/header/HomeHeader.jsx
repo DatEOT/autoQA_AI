@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import "./HomeHeader.css"
+import axios from 'axios';
+import "./HomeHeader.css";
+
 function HomeHeader() {
+  const [logoUrl, setLogoUrl] = useState(null);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/config'}/website/1`, {
+          headers: {
+            "API-Key": process.env.REACT_APP_API_KEY
+          }
+        });
+        if (data.logo) {
+          setLogoUrl(data.logo);
+        }
+      } catch (error) {
+        console.error("Error fetching logo:", error);
+      }
+    };
+
+    fetchLogo();
+  }, []);
+
   return (
     <header className="bg-dark bg-opacity-75 backdrop-blur sticky-top py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
       <div className="d-flex align-items-center">
-        <span className="fs-3 fw-bold text-white border border-white px-3 py-1">QnA App</span>
-        <span className="ms-2 text-warning fs-5 fw-bold" style={{ transform: 'rotate(15deg)' }}>?</span>
+        {logoUrl && (
+          <img src={logoUrl} alt="Logo" className="me-2 header-logo" />
+        )}
       </div>
       <nav>
         <ul className="nav">
-        <li className="nav-item">
+          <li className="nav-item">
             <Link to="/rechargepage" className="nav-link text-white">Recharge</Link>
           </li>
           <li className="nav-item">
