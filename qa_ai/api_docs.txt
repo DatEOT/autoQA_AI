@@ -1,40 +1,33 @@
 
 Routers/Question(
----API DOCUMENTATION: Generate Questions from Exam Document---
+---API DOCUMENTATION - /questions/generate
 
-Endpoint:
-POST /questions/generate
+Phương thức: POST
+URL: /questions/generate
 
-Description:
-Tạo bộ câu hỏi trắc nghiệm từ file tài liệu PDF của một môn thi cụ thể, dựa theo cấp độ tư duy Bloom (6 cấp độ).
-Kết quả trả về bao gồm câu hỏi & đáp án cho từng cấp độ, đường dẫn tải file định dạng Word.
+YÊU CẦU XÁC THỰC:
+-----------------
+- Header: Authorization: Bearer <token>
+- Header: API-Key: <your_api_key> (VD: 2605)
 
-Authentication:
-Yêu cầu Header:
-API-Key: <string>
+FORM DATA (multipart/form-data):
+--------------------------------
+- file (File, Bắt buộc): File PDF đề cương
+- exam_subject (String, Bắt buộc): Môn thi (VD: "1", "Văn học")
+- exam_duration (String, Bắt buộc): Thời gian làm bài (VD: "60 phút")
+- num_questions (Integer, Bắt buộc): Tổng số câu hỏi cần tạo
+- level_1 -> level_6 (Integer, Bắt buộc): Số câu theo từng cấp độ Bloom (từ nhớ đến sáng tạo)
 
-Request
-
-Headers:
-- accept: application/json
-- API-Key: 2605
-- Content-Type: multipart/form-data
-
-Form Data Parameters:
-- exam_subject (string, required): Tên môn học (VD: "Tâm Lí Học")
-- exam_duration (string, required): Thời gian thi (VD: "120 phút")
-- num_questions (integer, required): Số lượng câu hỏi
-- level_1 đến level_6 (integer, required): Số câu hỏi cho mỗi cấp độ
-- file (file, required): File PDF đề thi
-
-Curl Example:
+REQUEST MẪU:
+------------
 curl -X 'POST' \
   'http://127.0.0.1:8000/questions/generate' \
   -H 'accept: application/json' \
+  -H 'Authorization: Bearer <your_token>' \
   -H 'API-Key: 2605' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'exam_subject=Tâm Lí Học' \
-  -F 'exam_duration=120 phút' \
+  -F 'exam_subject=1' \
+  -F 'exam_duration=1' \
   -F 'num_questions=6' \
   -F 'level_1=1' \
   -F 'level_2=1' \
@@ -44,29 +37,32 @@ curl -X 'POST' \
   -F 'level_6=1' \
   -F 'file=@TLHĐC-pages-1.pdf;type=application/pdf'
 
-Response (200 OK):
+RESPONSE MẪU:
+-------------
 {
-  "file_id": "uuid",
+  "file_id": "uuid-xxx",
   "original_filename": "TLHĐC-pages-1.pdf",
   "num_segments": 7,
-  "formatted_docx_download_url": "/questions/download/formatted/uuid",
-  "simple_docx_download_url": "/questions/download/simple/uuid",
+  "formatted_docx_download_url": "/questions/download/formatted/{file_id}",
+  "simple_docx_download_url": "/questions/download/simple/{file_id}",
   "questions_and_answers": [
     {
       "level": "Cấp độ 1 - Nhớ",
       "questions": {
-        "Câu 1: ...": "..."
+        "Câu hỏi 1": "Nội dung trả lời 1"
       }
     },
     ...
   ]
 }
 
-Error Codes:
-- 400: Missing required field
-- 401: Invalid API key
-- 415: Unsupported Media Type (chỉ hỗ trợ file PDF)
-- 500: Internal Server Error
+MÃ LỖI PHỔ BIẾN:
+---------------
+- 401 Unauthorized: Thiếu hoặc token không hợp lệ
+- 403 Forbidden: API Key không hợp lệ
+- 422 Unprocessable Entity: Thiếu file hoặc dữ liệu chưa hợp lệ
+- 500 Internal Server Error: Lỗi hệ thống
+
 
 
 

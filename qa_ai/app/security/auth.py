@@ -1,15 +1,16 @@
-import os
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from fastapi import HTTPException, status
+from app.config import settings
+
+
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 load_dotenv()
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 def hash_password(password: str) -> str:

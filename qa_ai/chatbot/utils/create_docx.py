@@ -45,7 +45,7 @@ def create_formatted_docx_file(
     doc.add_paragraph("")
 
     # ------------------- PHÂN BỔ CẤP ĐỘ BLOOM -------------------
-    doc.add_heading("PHÂN BỔ CẤP ĐỘ BLOOM:", level=1)
+    doc.add_heading("PHÂN BỐ CẤP ĐỘ BLOOM:", level=1)
     doc.add_paragraph(qa_result.bloom_assignment)
 
     # Xác định số cấp độ hiện có
@@ -61,23 +61,21 @@ def create_formatted_docx_file(
     doc.add_heading("CÂU HỎI VÀ CÂU TRẢ LỜI:", level=1)
     question_counter = 1
 
-    # Lặp qua từng cấp độ Bloom (theo thứ tự từ thấp đến cao)
     for level_idx, level_result in enumerate(qa_result.qa_results):
         # Heading cho cấp độ Bloom (ví dụ: "Cấp độ 1 - Nhớ")
         doc.add_heading(level_result["level"], level=2)
         questions_dict = level_result["questions"]
         num_questions = len(questions_dict)
 
-        # Tổng điểm cho cấp (ví dụ: nếu 6 cấp và cấp 1 thì 10% của 10 = 1.0 điểm)
+        # Tổng điểm cho cấp
         level_total_points = percentages[level_idx] * 10
 
         # Phân chia điểm cho từng câu trong cấp, làm tròn đến bội số 0.05
         points_alloc = []
         if num_questions > 0:
-            # Tính điểm cho từng câu (cho tất cả các câu trừ câu cuối cùng)
             for i in range(num_questions - 1):
                 raw = level_total_points / num_questions
-                nice = round(raw * 20) / 20  # làm tròn đến 0.05
+                nice = round(raw * 20) / 20
                 points_alloc.append(nice)
             sum_so_far = sum(points_alloc)
             last_point = level_total_points - sum_so_far
@@ -86,14 +84,17 @@ def create_formatted_docx_file(
         else:
             points_alloc = []
 
-        # Lặp qua từng câu hỏi, dùng chỉ số cục bộ để truy cập points_alloc
         for idx, (question, answer) in enumerate(questions_dict.items()):
-            para_question = doc.add_paragraph()
-            run_question_title = para_question.add_run(f"Câu {question_counter}: ")
-            run_question_title.bold = True
+            # Loại bỏ tiền tố "Câu X:" nếu đã tồn tại
+            clean_question = re.sub(r"^Câu \d+:\s*", "", question.strip())
+            # Định dạng câu hỏi với tiền tố đúng
+            formatted_question = f"Câu {question_counter}: {clean_question}"
 
-            run_question_text = para_question.add_run(clean_markdown_bold(question))
-            run_question_text.font.bold = False
+            para_question = doc.add_paragraph()
+            run_question_text = para_question.add_run(
+                clean_markdown_bold(formatted_question)
+            )
+            run_question_text.bold = True
 
             run_points = para_question.add_run(f" ({points_alloc[idx]} điểm)")
             run_points.bold = True
@@ -151,7 +152,7 @@ def create_simple_docx_file(
             raise HTTPException(status_code=500, detail="Phải có ít nhất 2 cấp độ")
         percentages = [0.10] + [0.90 / (num_levels - 1)] * (num_levels - 1)
 
-    # Tính toán và phân phối điểm cho từng câu hỏi
+    # Tính toán và phân phối điểm
     question_counter = 1
 
     for level_idx, level_result in enumerate(qa_result.qa_results):
@@ -173,10 +174,13 @@ def create_simple_docx_file(
             points_alloc = []
 
         for idx, (question, _) in enumerate(questions_dict.items()):
+            # Loại bỏ tiền tố "Câu X:" nếu đã tồn tại
+            clean_question = re.sub(r"^Câu \d+:\s*", "", question.strip())
+            # Định dạng câu hỏi với tiền tố đúng
+            formatted_question = f"Câu {question_counter}: {clean_question}"
+
             para = doc.add_paragraph()
-            para.add_run(
-                f"Câu {question_counter}: {question} ({points_alloc[idx]} điểm)"
-            )
+            para.add_run(f"{formatted_question} ({points_alloc[idx]} điểm)")
             question_counter += 1
 
     doc.save(docx_file_path)

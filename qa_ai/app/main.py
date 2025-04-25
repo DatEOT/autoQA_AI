@@ -45,25 +45,3 @@ app.include_router(config.router)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Question Generator API"}
-
-
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title="Question Generator API",
-        version="1.0.0",
-        description="API tạo câu hỏi theo cấp độ Bloom",
-        routes=app.routes,
-    )
-    openapi_schema["components"]["securitySchemes"] = {
-        "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
-        "apiKeyAuth": {"type": "apiKey", "in": "header", "name": "API-Key"},
-    }
-    for path in openapi_schema["paths"].values():
-        for method in path.values():
-            method.setdefault("security", []).append({"bearerAuth": []})
-            method.setdefault("security", []).append({"apiKeyAuth": []})
-
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema

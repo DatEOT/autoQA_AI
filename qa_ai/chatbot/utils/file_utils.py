@@ -4,7 +4,8 @@ from fastapi import UploadFile, HTTPException
 from docx import Document
 import re
 import unicodedata
-from langchain_community.document_loaders import PyPDFLoader  # Thêm import
+from langchain_community.document_loaders import PyPDFLoader
+from ingestion.ingestion import Ingestion
 
 logger = logging.getLogger(__name__)
 
@@ -88,3 +89,29 @@ def extract_text_from_file(file_path: Path, file_extension: str) -> str:
         raise HTTPException(
             status_code=500, detail=f"Lỗi khi trích xuất văn bản: {str(e)}"
         )
+
+
+def extract_segments_with_pages(pdf_path: Path, chunk_size: int = 2000):
+    loader = PyPDFLoader(str(pdf_path))
+    pages = loader.load()
+    page_texts = [
+        (page.page_content.strip(), page.metadata["page"] + 1) for page in pages
+    ]
+
+    ingestion = Ingestion(embedding_model_name="openai")
+    combined_text = "\n\n".join([text for text, _ in page_texts])
+    temp_path = Path("temp_extracted.txt")
+    temp_path.write_text(combined_text, encoding="utf-8")
+
+    docs = ingestion.process_txt(str(temp_path), chunk_size=chunk_size)
+
+    segments_with_pages = []
+    for i, doc in enumerate(docs):
+        segment_text = doc.page_content.strip()
+        matched_page = None
+        for page_text, page_number in page_texts:
+            if segment_text in page_text:
+                matched_page = page_number
+                break
+        segments_with_pages.append((i + 1, segment_text, matched_page or -1))
+    return segments_with_pages

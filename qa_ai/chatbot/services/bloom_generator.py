@@ -6,6 +6,7 @@ import re
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from chatbot.utils.bloom_keywords import BLOOM_KEYWORDS
+from chatbot.utils.file_utils import extract_segments_with_pages
 
 
 class BloomGenerator:
@@ -117,12 +118,16 @@ class BloomGenerator:
             answer = self.answer_generator.get_chain().invoke(
                 {
                     "question": question,
-                    "context": prompt,  # Truyền toàn bộ prompt thay vì chỉ segment_text
+                    "context": prompt,
                 }
             )
+            answer = re.sub(
+                r"Trích từ đoạn, trang \d+:",
+                f"Trích từ đoạn, trang {page_number}:",
+                answer,
+            )
 
-            # Kiểm tra xem câu trả lời có trích dẫn hợp lệ không
-            if not re.search(rf"Trích từ đoạn, trang {page_number}: “[^”]+”", answer):
+            if f"Trích từ đoạn, trang {page_number}:" not in answer:
                 answer += f"\n\nTrích từ đoạn, trang {page_number}: “Không có trích dẫn phù hợp được tìm thấy trong đoạn văn.”"
 
             results[question] = answer.strip()

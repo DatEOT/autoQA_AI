@@ -10,6 +10,10 @@ load_dotenv()
 class Settings:
     # SETTING
     DIR_ROOT = os.path.dirname(os.path.abspath(".env"))
+
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    ALGORITHM = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = 30
     # API KEY
     API_KEY = os.environ["API_KEY"]
 

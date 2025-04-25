@@ -7,7 +7,7 @@ import io
 import zipfile
 import logging
 import pymysql
-
+from chatbot.utils.file_utils import extract_segments_with_pages
 from app.models.question import QuestionRequest, FileResponseModel, QAResponse
 from chatbot.utils.create_docx import (
     create_formatted_docx_file,
@@ -180,28 +180,23 @@ async def generate_questions(
 
         file_id = str(uuid4())
         file_path = save_uploaded_file(file, file_id, UPLOAD_DIR)
-        extracted_text, metadata = extract_text_from_file(file_path, file_extension)
 
-        txt_path = TXT_DIR / f"{file_id}_extracted.txt"
-        txt_path.write_text(extracted_text, encoding="utf-8")
+        if file_extension == "pdf":
+            segments = extract_segments_with_pages(file_path, chunk_size=2000)
+        else:
+            extracted_text, metadata = extract_text_from_file(file_path, file_extension)
 
-        ingestion = Ingestion(embedding_model_name="openai")
-        docs = ingestion.process_txt(str(txt_path), chunk_size=2000)
+            txt_path = TXT_DIR / f"{file_id}_extracted.txt"
+            txt_path.write_text(extracted_text, encoding="utf-8")
 
-        # # Kiem tra chia đoan
-        # print(f"\n[TÁCH ĐOẠN] Số đoạn: {len(docs)}\n")
-        # for i, doc in enumerate(docs, start=1):
-        #     print(f"🔹 Đoạn {i}:\n{doc.page_content}\n{'-'*60}\n")
+            ingestion = Ingestion(embedding_model_name="openai")
+            docs = ingestion.process_txt(str(txt_path), chunk_size=2000)
 
-        segments = []
-        for i, doc in enumerate(docs):
-            # Tìm số trang tương ứng bằng cách kiểm tra vị trí văn bản
-            page_number = None
-            for meta in metadata:
-                if doc.page_content in extracted_text:  # Kiểm tra đoạn văn bản
-                    page_number = meta.get("page")
-                    break
-            segments.append((i + 1, doc.page_content, page_number))
+            segments = []
+            for i, doc in enumerate(docs):
+                segments.append(
+                    (i + 1, doc.page_content.strip(), None)
+                )  # không có số trang cho docx, txt
 
         if not segments:
             raise HTTPException(
