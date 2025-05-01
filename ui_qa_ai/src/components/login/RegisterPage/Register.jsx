@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import lockIcon from '../../../assets/images/lock-icon.png';
 import userIcon from '../../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
-
+import HomeHeader from '../../home/header/HomeHeader';
+import "../RegisterPage/Register.css"
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,52 +59,55 @@ const Register = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="auth-container">
-        <h2>Fill out the form below to register</h2>
-        {error && <p className="error">{error}</p>}
-        <form onSubmit={handleRegister}>
-          <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
-              />
-              <img src={userIcon} alt="User Icon" className="input-icon" />
+    <div className='app'>
+      <HomeHeader />
+      <div className="login-page">
+        <div className="auth-container">
+          <h2>REGISTER</h2>
+          {error && <p className="error">{error}</p>}
+          <form onSubmit={handleRegister}>
+            <div className="form-group">
+              <div className="input-wrapper">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  required
+                />
+                <img src={userIcon} alt="User Icon" className="input-icon" />
+              </div>
             </div>
-          </div>
-          <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-              />
-              <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+            <div className="form-group">
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                />
+                <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+              </div>
             </div>
-          </div>
-          <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm Password"
-                required
-              />
-              <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+            <div className="form-group">
+              <div className="input-wrapper">
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm Password"
+                  required
+                />
+                <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+              </div>
             </div>
-          </div>
-          <button type="submit">REGISTER</button>
-        </form>
-        <p className="register-link">
-          Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
-        </p>
+            <button type="submit">REGISTER</button>
+          </form>
+          <p className="register-link">
+            Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+          </p>
+        </div>
       </div>
     </div>
   );

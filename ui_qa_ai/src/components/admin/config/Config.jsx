@@ -138,7 +138,7 @@ const Config = () => {
       setLogoPreview(null);
       fetchConfig();
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Có lỗi xảy ra ❌");
+      toast.error(err.response?.data?.detail || "Có lỗi xảy ra");
     } finally {
       setLoading(false);
     }

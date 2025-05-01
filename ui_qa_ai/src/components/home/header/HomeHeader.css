@@ -40,3 +40,18 @@
 .header-logo:hover {
   transform: scale(1.05); /* Zoom nhẹ khi hover */
 }
+
+.main-header {
+  position: fixed;
+  top: 0; left: 0; width: 100%;
+  z-index: 1001;
+  background: rgba(0,0,0,0.22);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.navbar-custom .nav-link,
+.navbar-custom .btn {
+  font-weight: bold;
+  text-transform: uppercase;
+}

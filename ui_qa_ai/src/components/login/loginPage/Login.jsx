@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import lockIcon from '../../../assets/images/lock-icon.png';
 import userIcon from '../../../assets/images/user-icon.png';
 import { toast } from 'react-toastify';
+import HomeHeader from '../../home/header/HomeHeader';
 import './Login.css';
 
 const Login = () => {
@@ -49,7 +50,7 @@ const Login = () => {
         theme: 'light',
       });
   
-      navigate(role === 'admin' ? '/admin/dashboardadmin' : '/questiongenerator');
+      navigate('/questiongenerator');
     } catch (err) {
       if (err.response?.data?.detail === 'Tài khoản đã bị khóa') {
         setError('Tài khoản của bạn đã bị khóa.');
@@ -66,52 +67,55 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="auth-container">
-        <h1>LOGIN</h1>
-        {error && <p className="error">{error}</p>}
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
-                autoComplete="off"
-              />
-              <img src={userIcon} alt="User Icon" className="input-icon" />
+    <div className="app">
+      <HomeHeader />
+      <div className="login-page">
+        <div className="auth-container">
+          <h1>LOGIN</h1>
+          {error && <p className="error">{error}</p>}
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <div className="input-wrapper">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  required
+                  autoComplete="off"
+                />
+                <img src={userIcon} alt="User Icon" className="input-icon" />
+              </div>
             </div>
-          </div>
-          <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                autoComplete="off"
-              />
-              <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+            <div className="form-group">
+              <div className="input-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                  autoComplete="off"
+                />
+                <img src={lockIcon} alt="Lock Icon" className="input-icon" />
+              </div>
             </div>
-          </div>
-          <div className="form-options">
-            <label className="show-password">
-              <input
-                type="checkbox"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-              />
-              Show Password
-            </label>
-          </div>
-          <button type="submit">LOGIN</button>
-        </form>
-        <p className="register-link">
-          Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
-        </p>
+            <div className="form-options">
+              <label className="show-password">
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={() => setShowPassword(!showPassword)}
+                />
+                Show Password
+              </label>
+            </div>
+            <button type="submit">LOGIN</button>
+          </form>
+          <p className="register-link">
+            Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -32,16 +32,23 @@ const MainLayout = () => {
     navigate('/homedashboard');
   };
 
+  const isAdminPage = location.pathname.startsWith('/admin');
+
+
   return (
     <div className="d-flex vh-100">
-      {/* Sidebar */}
       <CSidebar className="border-end" colorScheme="dark">
         <CSidebarNav>
-        <CNavTitle>User Info</CNavTitle>
+          {isAdminPage && role === 'admin' ? (
+            <CNavTitle>Admin Info</CNavTitle>
+          ) : (
+            <CNavTitle>User Info</CNavTitle>
+          )}
+                   
           <div className="px-3 text-white small">
             <strong>Email:</strong> {email}
           </div>
-          {role === 'user' && (
+          {(role === 'user' || (role === 'admin' && !isAdminPage)) && (
             <div className="px-3 text-white small mb-2">
               <strong>Token:</strong> {balance}
             </div>
@@ -49,7 +56,7 @@ const MainLayout = () => {
 
           <CNavTitle>Menu</CNavTitle>
 
-          {role === 'admin' ? (
+          {isAdminPage && role === 'admin' ? (
             <>
               <CNavItem href="/admin/dashboardadmin" active={location.pathname === '/admin/dashboardadmin'}>
                 <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Dashboard
@@ -69,6 +76,11 @@ const MainLayout = () => {
             </>
           ) : (
             <>
+              {role === 'admin' && (
+                <CNavItem href="/admin/dashboardadmin">
+                  <CIcon customClassName="nav-icon" icon={cilSpeedometer} /> Quản trị
+                </CNavItem>
+              )}
               <CNavItem href="/questiongenerator" active={location.pathname === '/questiongenerator'}>
                 <CIcon customClassName="nav-icon" icon={cilList} /> Tạo câu hỏi
               </CNavItem>
@@ -90,7 +102,6 @@ const MainLayout = () => {
         </CSidebarNav>
       </CSidebar>
 
-      {/* Main content */}
       <div className="flex-grow-1 d-flex flex-column">
         <div className="p-4 bg-light flex-grow-1 overflow-auto">
           <Outlet />

@@ -26,35 +26,29 @@ function HomeHeader() {
   }, []);
 
   return (
-    <header className="bg-dark bg-opacity-75 backdrop-blur sticky-top py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
+    <header className="main-header py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
       <div className="d-flex align-items-center">
         {logoUrl && (
           <img src={logoUrl} alt="Logo" className="me-2 header-logo" />
         )}
       </div>
       <nav>
-        <ul className="nav">
+        <ul className="nav navbar-custom">
           <li className="nav-item">
-            <Link to="/rechargepage" className="nav-link text-white">Recharge</Link>
-          </li>
-          <li className="nav-item">
-            <a href="#product" className="nav-link text-white">Product</a>
-          </li>
-          <li className="nav-item">
-            <a href="#developer" className="nav-link text-white">Developer</a>
-          </li>
-          <li className="nav-item">
-            <a href="#pricing" className="nav-link text-white">Pricing</a>
-          </li>
-          <li className="nav-item">
-            <a href="#about" className="nav-link text-white">About Us</a>
-          </li>
-          <li className="nav-item">
-            <a href="#contact" className="nav-link text-white">Contact Us</a>
-          </li>
-          <li className="nav-item">
-            <Link to="/login" className="btn btn-outline-light fw-bold ms-3">LOGIN</Link>
-          </li>
+              <Link to="/homedashboard" className="nav-link text-white">Home</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/rechargepage" className="nav-link text-white">Recharge</Link>
+            </li>
+            <li className="nav-item">
+              <a href="#about" className="nav-link text-white">About Us</a>
+            </li>
+            <li className="nav-item">
+              <a href="#contact" className="nav-link text-white">Contact Us</a>
+            </li>
+            <li className="nav-item">
+              <Link to="/login" className="btn btn-outline-light fw-bold ms-3">LOGIN</Link>
+            </li>
         </ul>
       </nav>
     </header>

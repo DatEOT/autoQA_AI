@@ -6,7 +6,6 @@ import {
   Statistic,
   Tabs,
   Table,
-  Typography,
   DatePicker,
 } from 'antd';
 import axios from 'axios';
@@ -25,7 +24,6 @@ import dayjs from 'dayjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import '@ant-design/v5-patch-for-react-19';
 
-const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
@@ -34,7 +32,7 @@ const Dashboard = () => {
   const [range, setRange] = useState([null, null]);
   const [rangeStats, setRangeStats] = useState({ creation: 0, questions: 0 });
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("chart");
+  const [activeTab, setActiveTab] = useState("top-users");
   const [balanceData, setBalanceData] = useState({
     total_added: 0,
     total_subtracted: 0,
@@ -132,7 +130,7 @@ const Dashboard = () => {
           net_change: Number(data.net_change ?? 0),
         });
       } catch (error) {
-        console.error("❌ Error fetching balance breakdown:", error);
+        console.error("Error fetching balance breakdown:", error);
         if (error.response) {
           console.error("➡ Response:", error.response.data);
         }
@@ -213,7 +211,6 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '24px 24px 40px 24px', fontFamily: 'Segoe UI, sans-serif' }}>
-      <Title level={2} style={{ marginBottom: 24 }}>📊 Question Statistics</Title>
 
       <Row gutter={[24, 24]}>
         <AnimatePresence>
@@ -315,8 +312,8 @@ const Dashboard = () => {
       {activeTab === 'balance' && (
         <div style={{ textAlign: 'right', fontStyle: 'italic', color: '#888', marginTop: 8 }}>
           {Array.isArray(range) && range[0] && range[1]
-            ? `📅 Từ ${dayjs(range[0]).format('DD/MM/YYYY')} đến ${dayjs(range[1]).format('DD/MM/YYYY')}`
-            : '📅 Thống kê toàn thời gian'}
+            ? `Từ ${dayjs(range[0]).format('DD/MM/YYYY')} đến ${dayjs(range[1]).format('DD/MM/YYYY')}`
+            : ''}
         </div>
       )}
 
@@ -350,6 +347,20 @@ const Dashboard = () => {
         onChange={(key) => setActiveTab(key)}
         items={[
           {
+            key: 'top-users',
+            label: '👥 Top Users',
+            children: (
+              <Card style={cardStyle}>
+                <Table
+                  dataSource={topUsers}
+                  columns={userColumns}
+                  rowKey="idUser"
+                  pagination={false}
+                />
+              </Card>
+            ),
+          },
+          {
             key: 'chart',
             label: '📈 Question Chart',
             children: (
@@ -382,20 +393,7 @@ const Dashboard = () => {
               </Card>
             ),
           },
-          {
-            key: 'top-users',
-            label: '👥 Top Users',
-            children: (
-              <Card style={cardStyle}>
-                <Table
-                  dataSource={topUsers}
-                  columns={userColumns}
-                  rowKey="idUser"
-                  pagination={false}
-                />
-              </Card>
-            ),
-          },
+          
           {
             key: 'balance',
             label: '💰 Balance',

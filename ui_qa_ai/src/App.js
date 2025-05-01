@@ -17,6 +17,7 @@ import TransactionHistory from './components/admin/Transaction/TransactionHistor
 import AdminBlogManager from './components/admin/blog/AdminBlogManager';
 import RechargePage from './components/home/RechargePage';
 import ChangePassword from './components/user/ChangePasswordPage/ChangePassword ';
+import RequireAuth from './components/security/RequireAuth';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -46,7 +47,7 @@ const App = () => {
             <Route path="/" element={<HomeDashboard />} />
 
             {/* Các route dùng chung layout có sidebar */}
-            <Route path="/" element={<MainLayout />}>
+            <Route path="/" element={<RequireAuth><MainLayout /></RequireAuth>}>
               {/* USER ROUTES */}
               <Route path="questiongenerator" element={<QuestionGenerator />} />
               <Route path="/changepassword" element={<ChangePassword />} />

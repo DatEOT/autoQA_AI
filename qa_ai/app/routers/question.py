@@ -1,6 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from fastapi.responses import StreamingResponse
-from typing import List, Tuple
 from uuid import uuid4
 from pathlib import Path
 import io
@@ -21,15 +20,13 @@ from app.security.security import get_api_key
 from chatbot.utils.file_utils import save_uploaded_file, extract_text_from_file
 from chatbot.utils.validation_utils import (
     validate_request,
-    get_bloom_level_name,
-    generate_bloom_assignment,
 )
 from chatbot.utils.db_utils import (
     deduct_token_and_log_transaction,
     insert_question_history,
 )
-from chatbot.utils.bloom_keywords import BLOOM_KEYWORDS
-from chatbot.services.bloom_generator import BloomGenerator
+from chatbot.services.question_processing_service import generate_qa_content
+
 
 from docx2pdf import convert
 
@@ -39,73 +36,6 @@ TXT_DIR = Path("txt")
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 TXT_DIR.mkdir(exist_ok=True)
-
-
-def generate_qa_content(
-    segments: List[Tuple[str, str]], request: QuestionRequest
-) -> QAResponse:
-    bloom_assignment, segments_per_level = generate_bloom_assignment(segments, request)
-    # #Kiểm tra phân bổ đoạn văn theo từng cấp độ
-    # print("\nKIỂM TRA PHÂN BỔ ĐOẠN VĂN:")
-    # level_question_counts = [
-    #     request.level_1,
-    #     request.level_2,
-    #     request.level_3,
-    #     request.level_4,
-    #     request.level_5,
-    #     request.level_6,
-    # ]
-    # for i in range(6):
-    #     print(
-    #         f"🔹 Cấp độ {i+1}: {level_question_counts[i]} câu hỏi → {segments_per_level[i]} đoạn văn"
-    #     )
-    # print(f" Tổng đoạn văn: {len(segments)}")
-    # print(f" Tổng câu hỏi: {sum(level_question_counts)}")
-    # print(f" Tổng đoạn đã phân bổ: {sum(segments_per_level)}\n")
-
-    qa_results = []
-    bloom_gen = BloomGenerator(llm_name="openai")
-
-    idx = 0
-    global_question_index = 1
-    for level, num_segments in enumerate(segments_per_level, start=1):
-        if num_segments == 0:
-            continue
-
-        level_segments = segments[idx : idx + num_segments]
-        idx += num_segments
-
-        level_name = get_bloom_level_name(level)
-        bloom_keywords = BLOOM_KEYWORDS.get(level, "")
-
-        num_questions = getattr(request, f"level_{level}")
-        segments_with_keywords = [
-            (label, text, bloom_keywords, page)
-            for (label, text, page) in level_segments
-        ]
-
-        qas = bloom_gen.generate_questions_for_level(
-            level,
-            segments_with_keywords,
-            num_questions,
-            level_name,
-            bloom_keywords,
-            start_index=global_question_index,
-        )
-        global_question_index += len(qas)
-
-        answers = bloom_gen.generate_answers_for_pairs(qas)
-
-        qa_results.append(
-            {
-                "level": f"Cấp độ {level} - {level_name}",
-                "questions": answers,
-            }
-        )
-
-    return QAResponse(
-        bloom_assignment="\n".join(bloom_assignment), qa_results=qa_results
-    )
 
 
 @router.get("/download/zip/{file_id}", response_class=StreamingResponse)
@@ -195,7 +125,7 @@ async def generate_questions(
             segments = []
             for i, doc in enumerate(docs):
                 segments.append(
-                    (i + 1, doc.page_content.strip(), None)
+                    (str(i + 1), doc.page_content.strip(), None)
                 )  # không có số trang cho docx, txt
 
         if not segments:
