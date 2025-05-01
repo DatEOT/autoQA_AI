@@ -10,22 +10,23 @@ import {
 } from 'antd';
 import axios from 'axios';
 import { FileTextOutlined } from '@ant-design/icons';
+import { Bar } from 'react-chartjs-2';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
   Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  LabelList,
-} from 'recharts';
+  Legend,
+} from 'chart.js';
+
 import dayjs from 'dayjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import '@ant-design/v5-patch-for-react-19';
 
 const { RangePicker } = DatePicker;
-
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 const Dashboard = () => {
   const [statsToShow, setStatsToShow] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
@@ -190,10 +191,54 @@ const Dashboard = () => {
   
   
 
-  const chartData = [
-    { name: 'Created Times', value: rangeStats.creation },
-    { name: 'Number of Questions', value: rangeStats.questions },
-  ];
+  const chartData = {
+    labels: ['Created Times', 'Number of Questions'],
+    datasets: [
+      {
+        label: 'Statistics',
+        data: [rangeStats.creation, rangeStats.questions],
+        backgroundColor: 'rgba(24, 144, 255, 0.6)',
+        borderColor: 'rgba(24, 144, 255, 1)',
+        borderWidth: 1,
+        borderRadius: 10,
+        hoverBackgroundColor: 'rgba(24, 144, 255, 0.8)',
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false, // Ẩn legend nếu không cần
+      },
+      tooltip: {
+        backgroundColor: '#ffffff',
+        titleColor: '#000',
+        bodyColor: '#000',
+        borderColor: '#ccc',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false, // Ẩn lưới trục X
+        },
+      },
+      y: {
+        grid: {
+          borderDash: [3, 3], // Đường lưới nét đứt
+        },
+        beginAtZero: true,
+      },
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart',
+    },
+  };
 
   const userColumns = [
     { title: 'ID User', dataIndex: 'idUser', key: 'idUser' },
@@ -318,28 +363,26 @@ const Dashboard = () => {
       )}
 
       <div style={{ marginTop: 24, marginBottom: 16, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-      <RangePicker
-        format="YYYY-MM-DD"
-        value={range}
-        onChange={(val) => {
-          setRange(val);
+          <RangePicker
+            format="YYYY-MM-DD"
+            value={range}
+            onChange={(val) => {
+              setRange(val);
 
-          // Nếu người dùng xóa ngày đã chọn
-          if (!val || !val[0] || !val[1]) {
-            fetchDefaultStats();
-            fetchTopUsers();
-            return;
-          }
+              // Nếu người dùng xóa ngày đã chọn
+              if (!val || !val[0] || !val[1]) {
+                fetchDefaultStats();
+                fetchTopUsers();
+                return;
+              }
 
-          // Nếu chọn đủ 2 ngày, gọi fetch theo khoảng
-          fetchStatsInRange(val);
-        }}
-        showTime={false}
-        allowClear // Cho phép xóa ngày
-        panelRender={(panelNode) => <div style={{ maxWidth: 280 }}>{panelNode}</div>}
-      />
-
-
+              // Nếu chọn đủ 2 ngày, gọi fetch theo khoảng
+              fetchStatsInRange(val);
+            }}
+            showTime={false}
+            allowClear // Cho phép xóa ngày
+            panelRender={(panelNode) => <div style={{ maxWidth: 280 }}>{panelNode}</div>}
+          />
       </div>
 
       <Tabs
@@ -365,31 +408,9 @@ const Dashboard = () => {
             label: '📈 Question Chart',
             children: (
               <Card style={cardStyle}>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData} barSize={60}>
-                    <defs>
-                      <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#1890ff" stopOpacity={0.9} />
-                        <stop offset="100%" stopColor="#91d5ff" stopOpacity={0.6} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #ccc' }}
-                      labelStyle={{ fontWeight: 'bold' }}
-                    />
-                    <Bar
-                      dataKey="value"
-                      fill="url(#colorBar)"
-                      radius={[10, 10, 0, 0]}
-                      animationDuration={1000}
-                    >
-                      <LabelList dataKey="value" position="top" style={{ fill: '#000', fontWeight: 600 }} />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <div style={{ height: 300 }}>
+                  <Bar data={chartData} options={chartOptions} />
+                </div>
               </Card>
             ),
           },

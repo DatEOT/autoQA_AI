@@ -1,16 +1,60 @@
-docker build -t qa_fastapi_app .
+# 📚 Tự Động Tạo Câu Hỏi/Trả Lời Dựa Trên Giáo Trình Bằng AI
 
-docker run -d --restart always -p 55036:55036 --name qa_fastapi_container qa_fastapi_app
+Dự án này sử dụng trí tuệ nhân tạo để tự động tạo các câu hỏi và câu trả lời từ giáo trình (pdf,docx,txt) đầu vào. Hệ thống hỗ trợ phân loại câu hỏi theo cấp độ tư duy Bloom và xuất kết quả theo định dạng có thể tải xuống.
 
-docker save -o api_web_leech_truyen_audio.tar api_web_leech_truyen_audio
+---
 
-docker load -i api_web_leech_truyen_audio.tar
+## 💡 Mục Tiêu Đề Tài
 
-docker exec -it api_web_leech_truyen_audio bash
+- Tự động sinh câu hỏi/trả lời theo từng cấp độ nhận thức.
+- Trích xuất thông tin từ giáo trình (file pdf,docx,txt).
+- Tạo câu hỏi phù hợp cho thi cử, kiểm tra, luyện tập.
+- Cung cấp định dạng tải xuống đơn giản và định dạng docx,pdf chuẩn.
 
-python -m venv ten_moi_truong
+---
+
+## 🧰 Công Nghệ Sử Dụng
+
+- **Ngôn ngữ Backend:** Python
+- **Framework:** FastAPI
+- **Xử lý AI:** OpenAI GPT (hỗ trợ nhiều biến thể: `gpt-4o-mini`, `gpt-4`, ...)
+- **Phân tích tài liệu:** PyMuPDF, LangChain
+- **Quản lý phân quyền:** Bearer Token + API Key
+- **Hệ thống phân cấp Bloom:** Cấp độ 1 → 6
+
+---
+
+## 📦 Cài Đặt Dự Án
+
+```bash
+# 1. Clone dự án
+git clone https://github.com/DatEOT/autoQA_AI.git
+cd autoQA_AI (Folder cha chứa 2 folder con là backend và frontend)
+cd qa_ai (backend)
+
+# 2. Tạo virtual environment và kích hoạt
+python -m venv myproject_env
 myproject_env\Scripts\activate
 
-pip freeze > requirements.txt
+# 3. Cài đặt dependencies
+pip install -r requirements.txt
 
-Remove-Item -Path .git -Recurse -Force
+```
+
+## 🚀 Khởi Chạy Server
+
+python run_api.py
+
+---
+
+## 📌Ghi Chú
+
+Cần token hợp lệ và API Key khi sử dụng.
+Hệ thống hỗ trợ tiếng Việt.
+Tập trung vào giáo dục đại học, phổ thông.
+
+## 🧑‍💻Tác Giả
+
+ĐạtEOT (Nguyễn Thành Đạt)
+Email:thanhdat5699636@gmail.com
+GitHub:github.com/DatEOT

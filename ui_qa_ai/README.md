@@ -1,73 +1,57 @@
-# Getting Started with Create React App
+# 🌐 Giao Diện Người Dùng - Tự Động Tạo Câu Hỏi AI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Giao diện người dùng cho hệ thống AI tạo câu hỏi/trả lời tự động từ file giáo trình (PDF, DOCX, TXT), phân loại theo cấp độ Bloom, tích hợp backend xây bằng FastAPI.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 Chức Năng Chính
 
-### `npm start`
+- 🎓 Upload tài liệu giáo trình (PDF, DOCX, TXT)
+- 🧠 Chọn cấp độ Bloom cho từng loại câu hỏi (1→6)
+- ⏱️ Nhập thông tin môn thi và thời gian thi
+- 🧾 Tùy chọn số lượng câu hỏi
+- 🗂️ Tải xuống kết quả dưới dạng ZIP (DOCX)
+- 🔐 Hỗ trợ bảo mật với Token và API-Key
+- 📊 Dashboard cho Admin, giao diện Sidebar đầy đủ
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧰 Công Nghệ Sử Dụng
 
-### `npm test`
+- ⚛️ **ReactJS** (v19)
+- 💅 **Ant Design**, **CoreUI**, **Bootstrap 5**
+- 📦 **Axios** cho HTTP requests
+- 🧩 **React Router DOM v7**
+- 🎉 **React Toastify** cho thông báo
+- 📊 **Recharts**, **ApexCharts**, **Chart.js**
+- 🧠 **Framer Motion**, **React Icons**
+- ⚙️ `react-app-rewired` để custom cấu hình CRA
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 📦 Cài Đặt & Chạy Ứng Dụng
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+# 1. Chuyển đường dẫn
+cd autoQA_AI (Folder cha chứa 2 folder con là backend và frontend)
+cd ui_qa_ai ( frontend )
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# 2. Cài đặt dependencies
+npm install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# 3. Chạy ứng dụng
+npm start
+```
 
-### `npm run eject`
+## 📌 Ghi Chú
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Phải đăng nhập để sử dụng các tính năng chính.
+Có phân quyền User/Admin trong giao diện.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🧑‍💻 Tác Giả
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-
-docker build -t qa_react:dev .
-docker run -p 3000:3000 qa_react:dev
+Nguyễn Thành Đạt (ĐạtEOT)
+📧 Email: thanhdat5699636@gmail.com
+🌐 GitHub: github.com/DatEOT

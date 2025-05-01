@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { Button } from 'antd';
+import { Button,Tooltip } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -18,6 +18,7 @@ import './UserList.css';
 const UserList = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const { role } = useParams();
+  const currentUserEmail = localStorage.getItem('email');
   const [users, setUsers] = useState([]);
   const [lastLogins, setLastLogins] = useState({});
   const [form, setForm] = useState({ email: '', password: '', role: 'user' });
@@ -239,6 +240,7 @@ const UserList = () => {
       }
     });
   };
+  
 
   return (
     <div className="user-list">
@@ -329,51 +331,44 @@ const UserList = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>{user.is_active ? '✅' : '❌'}</td>
-              <td>{user.balance} 🪙</td>
-              <td>{lastLogins[user.id] || 'Loading...'}</td>
-              <td>
-                <Button
-                  type="default"
-                  icon={<EditOutlined />}
-                  shape="circle"
-                  onClick={() => handleEdit(user)}
-                />
-                <Button
-                  danger
-                  type="default"
-                  icon={<DeleteOutlined />}
-                  shape="circle"
-                  onClick={() => handleDelete(user.id)}
-                />
-                <Button
-                  type="primary"
-                  ghost
-                  icon={user.is_active ? <LockOutlined /> : <UnlockOutlined />}
-                  shape="circle"
-                  onClick={() => toggleActive(user.id, user.is_active)}
-                />
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  shape="circle"
-                  onClick={() => handleUpdateBalance(user.id, 'add')}
-                />
-                <Button
-                  type="primary"
-                  danger
-                  icon={<MinusOutlined />}
-                  shape="circle"
-                  onClick={() => handleUpdateBalance(user.id, 'subtract')}
-                />
-              </td>
-            </tr>
-          ))}
+        {users.map((user) => {
+            const isAdminRecord = user.role === 'admin';
+            const isSuperAdmin = currentUserEmail === 'admin@1234';
+            const disableDelete = isAdminRecord && !isSuperAdmin;
+
+            return (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>{user.is_active ? '✅' : '❌'}</td>
+                <td>{user.balance} 🪙</td>
+                <td>{lastLogins[user.id] || 'Loading...'}</td>
+                <td>
+                  <Button type="default" icon={<EditOutlined />} shape="circle" onClick={() => handleEdit(user)} />
+                  <Tooltip title={disableDelete ? 'Không thể xóa admin' : 'Xóa user'}>
+                    <Button
+                      danger
+                      type="default"
+                      icon={<DeleteOutlined />}
+                      shape="circle"
+                      disabled={disableDelete}
+                      onClick={() => handleDelete(user.id)}
+                    />
+                  </Tooltip>
+                  <Button
+                    type="primary"
+                    ghost
+                    icon={user.is_active ? <LockOutlined /> : <UnlockOutlined />}
+                    shape="circle"
+                    onClick={() => toggleActive(user.id, user.is_active)}
+                  />
+                  <Button type="primary" icon={<PlusOutlined />} shape="circle" onClick={() => handleUpdateBalance(user.id, 'add')} />
+                  <Button type="primary" danger icon={<MinusOutlined />} shape="circle" onClick={() => handleUpdateBalance(user.id, 'subtract')} />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
