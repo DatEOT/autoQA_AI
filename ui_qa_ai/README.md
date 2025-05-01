@@ -43,6 +43,8 @@ npm install
 npm start
 ```
 
+---
+
 ## 📌 Ghi Chú
 
 Phải đăng nhập để sử dụng các tính năng chính.

@@ -41,6 +41,8 @@ pip install -r requirements.txt
 
 ```
 
+---
+
 ## 🚀 Khởi Chạy Server
 
 python run_api.py
@@ -53,8 +55,10 @@ Cần token hợp lệ và API Key khi sử dụng.
 Hệ thống hỗ trợ tiếng Việt.
 Tập trung vào giáo dục đại học, phổ thông.
 
+---
+
 ## 🧑‍💻Tác Giả
 
-ĐạtEOT (Nguyễn Thành Đạt)
-Email:thanhdat5699636@gmail.com
-GitHub:github.com/DatEOT
+Nguyễn Thành Đạt (ĐạtEOT)
+📧 Email: thanhdat5699636@gmail.com
+🌐 GitHub: github.com/DatEOT
