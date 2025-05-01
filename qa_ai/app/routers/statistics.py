@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends
 import pymysql
 from typing import Optional
 from datetime import date
-from app.models.statistics import UserQuestionStats, GlobalStats, PeriodStats
+from app.models.statistics import (
+    UserQuestionStats,
+    GlobalStats,
+    PeriodStats,
+)
 from app.utils.mysql_connection import get_db
 from app.security.security import get_api_key
 

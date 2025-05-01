@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import './QuestionGenerator.css';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
+import ApiKeySelector from './ApiKeySelector';
 const BloomLevels = ({ totalQuestions, onSumChange }) => {
   const [levels, setLevels] = useState({
     level_1: 0,
@@ -200,6 +201,8 @@ const QuestionGenerator = () => {
   const [bloomSum, setBloomSum] = useState(0);
   const [examSubject, setExamSubject] = useState('');
   const [examDuration, setExamDuration] = useState('');
+  const [provider, setProvider] = useState('');
+  const [modelVariant, setModelVariant] = useState('');
 
   const handleGenerateQuestions = async () => {
     if (!file) {
@@ -220,6 +223,14 @@ const QuestionGenerator = () => {
       return;
     }
 
+    if (!provider || !modelVariant) {
+      toast.error('Vui lòng chọn provider & model_variant.', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -227,6 +238,8 @@ const QuestionGenerator = () => {
     formData.append('exam_subject', examSubject);
     formData.append('exam_duration', examDuration);
     formData.append('num_questions', totalQuestions);
+    formData.append('provider', provider);
+    formData.append('model_variant', modelVariant);
 
     // Lấy giá trị các input của BloomLevels thông qua DOM
     const bloomLevels = document.querySelectorAll('.bloom-levels input');
@@ -273,6 +286,12 @@ const QuestionGenerator = () => {
   return (
     <div className="container">
       <h1>Tạo Câu Hỏi Tự Luận từ File DOCX, PDF, TXT</h1>
+      <ApiKeySelector
+        provider={provider}
+        setProvider={setProvider}
+        modelVariant={modelVariant}
+        setModelVariant={setModelVariant}
+      />
       
       {/* Phần nhập thông tin môn thi và thời gian thi */}
       <ExamDetails

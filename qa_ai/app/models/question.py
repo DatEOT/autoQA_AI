@@ -4,6 +4,8 @@ from typing import List, Dict, Any
 
 # Input: Yêu cầu từ người dùng
 class QuestionRequest(BaseModel):
+    provider: str
+    model_variant: str
     num_questions: int = Field(..., ge=1, description="Tổng số câu hỏi cần tạo")
     level_1: int = Field(..., ge=0, description="Số câu hỏi cấp độ 1")
     level_2: int = Field(..., ge=0, description="Số câu hỏi cấp độ 2")

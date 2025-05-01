@@ -12,6 +12,8 @@ from chatbot.utils.validation_utils import (
 def generate_qa_content(
     segments: List[Tuple[str, str, Any]],
     request: QuestionRequest,
+    provider: str,
+    model_variant: str,
 ) -> QAResponse:
     print("\n" + "*" * 50)
     print("--- DỮ LIỆU ĐẦU VÀO generate_qa_content ---")
@@ -28,7 +30,7 @@ def generate_qa_content(
     )
 
     qa_results = []
-    bloom_gen = BloomGenerator(llm_name="openai")
+    bloom_gen = BloomGenerator(provider, model_variant)
     global_question_index = 1
 
     print("\n" + "-" * 50)

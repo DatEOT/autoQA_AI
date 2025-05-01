@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnableSequence
 
 
 class AnswerGenerator:
-    def __init__(self, llm) -> None:
+    def __init__(self, llm):
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", CustomPrompt.GENERATE_ANSWER_PROMPT),

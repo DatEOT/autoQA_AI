@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.config import settings  # config chứa API keys, model name
+from app.utils.mysql_connection import get_plain_key
 
 
 class LLM:
@@ -15,27 +16,42 @@ class LLM:
         self.max_tokens = max_tokens
         self.n_ctx = n_ctx
 
-    def open_ai(self):
+    def _openai(self, model_variant: str):
+        key = get_plain_key("openai", model_variant)
         return ChatOpenAI(
-            openai_api_key=settings.KEY_API_GPT,
-            model=settings.OPENAI_LLM,  # vd: "gpt-4o"
+            openai_api_key=key,
+            model=model_variant,
             temperature=self.temperature,
         )
 
-    def gemini(self):
+    def _gemini(self, model_variant: str):
+        key = get_plain_key("gemini", model_variant)
         return ChatGoogleGenerativeAI(
-            google_api_key=settings.KEY_API,
-            model=settings.GOOGLE_LLM,  # vd: "gemini-pro"
+            google_api_key=key,
+            model=model_variant,
+            temperature=self.temperature,
+            max_output_tokens=self.max_tokens,
+        )
+
+    def _grok(self, model_variant: str):
+        key = get_plain_key("grok", model_variant)
+        return ChatGoogleGenerativeAI(
+            google_api_key=key,
+            model=model_variant,
             temperature=self.temperature,
         )
 
-    def get_llm(self, llm_name: str):
+    def get_llm(self, provider: str, model_variant: str):
         """
         Trả về đối tượng LLM tương ứng theo tên: "openai" hoặc "gemini".
         """
-        if llm_name == "openai":
-            return self.open_ai()
-        elif llm_name == "gemini":
-            return self.gemini()
-        else:
-            return self.open_ai()  # mặc định là OpenAI
+
+        match provider.lower():
+            case "openai":
+                return self._openai(model_variant)
+            case "gemini":
+                return self._gemini(model_variant)
+            case "grok":
+                return self._grok(model_variant)
+            case _:
+                raise ValueError(f"Unsupported provider '{provider}'")

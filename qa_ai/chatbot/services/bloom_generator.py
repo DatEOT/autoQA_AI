@@ -15,8 +15,10 @@ from langchain_core.documents import Document as LCDocument
 
 
 class BloomGenerator:
-    def __init__(self, llm_name: str = "openai", embedding_model_name: str = "openai"):
-        self.llm = LLM().get_llm(llm_name)
+    def __init__(
+        self, provider: str, model_variant: str, embedding_model_name: str = "openai"
+    ):
+        self.llm = LLM().get_llm(provider, model_variant)
         self.answer_generator = AnswerGenerator(self.llm)
         self.embedding_model = ServiceManager().get_embedding_model(
             embedding_model_name

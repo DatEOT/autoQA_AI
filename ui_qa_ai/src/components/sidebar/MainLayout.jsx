@@ -9,6 +9,7 @@ import {
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
 import {
+  cilLockLocked,
   cilSettings,
   cilSpeedometer,
   cilUser,
@@ -72,6 +73,9 @@ const MainLayout = () => {
               </CNavItem>
               <CNavItem href="/admin/config" active={location.pathname === '/admin/config'}>
                 <CIcon customClassName="nav-icon" icon={cilSettings} /> Config
+              </CNavItem>
+              <CNavItem href="/admin/apikey" active={location.pathname === '/admin/apikey'}>
+                <CIcon customClassName="nav-icon" icon={cilLockLocked} /> Apikey
               </CNavItem>
             </>
           ) : (

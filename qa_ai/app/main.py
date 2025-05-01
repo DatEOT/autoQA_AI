@@ -10,6 +10,7 @@ from app.routers import (
     transaction_history,
     blogs,
     config,
+    api_keys,
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.utils import get_openapi
@@ -40,6 +41,7 @@ app.include_router(statistics.router)
 app.include_router(transaction_history.router)
 app.include_router(blogs.router)
 app.include_router(config.router)
+app.include_router(api_keys.router)
 
 
 @app.get("/")

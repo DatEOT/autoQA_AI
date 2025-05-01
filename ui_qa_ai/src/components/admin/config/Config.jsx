@@ -287,8 +287,6 @@ const Config = () => {
     <div className="p-6 max-w-4xl mx-auto">
       {/* toast container */}
       <ToastContainer position="top-right" newestOnTop theme="colored" />
-
-      <h1 className="text-2xl font-bold mb-4">Configuration Management</h1>
       <Tabs defaultActiveKey="1" type="card" items={tabItems} />
     </div>
   );

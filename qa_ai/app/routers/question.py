@@ -26,6 +26,7 @@ from chatbot.utils.db_utils import (
     insert_question_history,
 )
 from chatbot.services.question_processing_service import generate_qa_content
+from chatbot.services.bloom_generator import BloomGenerator
 
 
 from docx2pdf import convert
@@ -79,6 +80,8 @@ def download_zip(file_id: str):
 @router.post("/generate", response_model=FileResponseModel)
 async def generate_questions(
     file: UploadFile = File(...),
+    provider: str = Form(...),
+    model_variant: str = Form(...),
     exam_subject: str = Form(...),
     exam_duration: str = Form(...),
     num_questions: int = Form(..., ge=1),
@@ -105,6 +108,8 @@ async def generate_questions(
             level_4=level_4,
             level_5=level_5,
             level_6=level_6,
+            provider=provider,
+            model_variant=model_variant,
         )
         validate_request(request)
 
@@ -142,7 +147,8 @@ async def generate_questions(
 
         deduct_token_and_log_transaction(db, current_user_id, cost=10)
 
-        qa_result = generate_qa_content(segments, request)
+        # sinh QA dùng đúng provider + model_variant
+        qa_result = generate_qa_content(segments, request, provider, model_variant)
 
         formatted_docx_path = TXT_DIR / f"{file_id}_formatted.docx"
         simple_docx_path = TXT_DIR / f"{file_id}_simple.docx"
