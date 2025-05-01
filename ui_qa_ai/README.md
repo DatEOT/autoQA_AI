@@ -47,13 +47,13 @@ npm start
 
 ## 📌 Ghi Chú
 
-Phải đăng nhập để sử dụng các tính năng chính.
-Có phân quyền User/Admin trong giao diện.
+- Phải đăng nhập để sử dụng các tính năng chính.
+- Có phân quyền User/Admin trong giao diện.
 
 ---
 
 ## 🧑‍💻 Tác Giả
 
-Nguyễn Thành Đạt (ĐạtEOT)
-📧 Email: thanhdat5699636@gmail.com
-🌐 GitHub: github.com/DatEOT
+- Nguyễn Thành Đạt (ĐạtEOT)
+- 📧 Email: thanhdat5699636@gmail.com
+- 🌐 GitHub: github.com/DatEOT

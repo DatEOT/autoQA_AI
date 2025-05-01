@@ -51,14 +51,14 @@ python run_api.py
 
 ## 📌Ghi Chú
 
-Cần token hợp lệ và API Key khi sử dụng.
-Hệ thống hỗ trợ tiếng Việt.
-Tập trung vào giáo dục đại học, phổ thông.
+- Cần token hợp lệ và API Key khi sử dụng.
+- Hệ thống hỗ trợ tiếng Việt.
+- Tập trung vào giáo dục đại học, phổ thông.
 
 ---
 
 ## 🧑‍💻Tác Giả
 
-Nguyễn Thành Đạt (ĐạtEOT)
-📧 Email: thanhdat5699636@gmail.com
-🌐 GitHub: github.com/DatEOT
+- Nguyễn Thành Đạt (ĐạtEOT)
+- 📧 Email: thanhdat5699636@gmail.com
+- 🌐 GitHub: github.com/DatEOT
