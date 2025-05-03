@@ -93,7 +93,7 @@ async def generate_questions(
     level_6: int = Form(..., ge=0),
     api_key: str = get_api_key,
     db: pymysql.connections.Connection = Depends(get_db),
-    current_user_id: int = Depends(get_current_user_id),
+    # current_user_id: int = Depends(get_current_user_id),
 ):
     try:
         file_extension = file.filename.split(".")[-1].lower()
@@ -145,7 +145,7 @@ async def generate_questions(
                 detail=f"Số đoạn văn ({len(segments)}) không đủ để tạo số cấp độ khác nhau.",
             )
 
-        deduct_token_and_log_transaction(db, current_user_id, cost=10)
+        # deduct_token_and_log_transaction(db, current_user_id, cost=10)
 
         # sinh QA dùng đúng provider + model_variant
         qa_result = generate_qa_content(segments, request, provider, model_variant)
@@ -164,7 +164,7 @@ async def generate_questions(
         convert(str(formatted_docx_path), str(formatted_pdf_path))
         convert(str(simple_docx_path), str(simple_pdf_path))
 
-        insert_question_history(db, current_user_id, num_questions)
+        # insert_question_history(db, current_user_id, num_questions)
 
         return FileResponseModel(
             file_id=file_id,

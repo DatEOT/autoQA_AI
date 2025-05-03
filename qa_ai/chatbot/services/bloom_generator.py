@@ -12,6 +12,7 @@ from langchain_core.output_parsers import StrOutputParser
 from ingestion.service_manager import ServiceManager
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document as LCDocument
+from chatbot.utils.bloom_keywords import BLOOM_KEYWORDS
 
 
 class BloomGenerator:
@@ -40,9 +41,7 @@ class BloomGenerator:
                     \nĐảm bảo các câu hỏi:
                     1. Bắt đầu bằng [Đoạn LABEL, Trang PAGE]: nếu có số trang, hoặc [Đoạn LABEL]: nếu không. LABEL phải khớp chính xác với nhãn đoạn được cung cấp (ví dụ, '1', '2', '8',...).
                     2. Chỉ dựa trên nội dung đoạn văn được cung cấp, không sử dụng nhãn hoặc nội dung ngoài danh sách.
-                    3. Với cấp độ Đánh giá, chỉ tạo câu hỏi nếu đoạn văn có thông tin về ưu điểm, hạn chế hoặc hiệu quả.
-                    4. Với cấp độ Sáng tạo, đề xuất phải cụ thể, gắn với một phương pháp hoặc khía cạnh trong đoạn văn, không quá rộng hoặc trừu tượng.
-                    5. Kiểm tra tính khả thi: Đảm bảo câu hỏi có thể trả lời dựa trên thông tin trong đoạn văn.
+                    3. Kiểm tra tính khả thi: Đảm bảo câu hỏi có thể trả lời dựa trên thông tin trong đoạn văn.
                   """,
                 ),
                 (
@@ -58,8 +57,6 @@ class BloomGenerator:
                     - Mỗi câu hỏi PHẢI bắt đầu bằng [Đoạn LABEL, Trang PAGE]: nếu có số trang, hoặc [Đoạn LABEL]: nếu không.
                     - LABEL phải khớp chính xác với nhãn đoạn được cung cấp (ví dụ, '1', '2', '8',...).
                     - Ví dụ: [Đoạn 8, Trang 5]: Đề xuất một cách cải thiện phương pháp trắc nghiệm...? hoặc [Đoạn 8]: Đề xuất một cách cải thiện...?
-                    - Với cấp độ Đánh giá: Chỉ tạo câu hỏi nếu đoạn văn có thông tin về ưu điểm, hạn chế hoặc hiệu quả.
-                    - Với cấp độ Sáng tạo: Đề xuất phải cụ thể, gắn với một phương pháp hoặc khía cạnh trong đoạn văn, không quá rộng.
                     - Chỉ tạo câu hỏi dựa trên các đoạn văn được cung cấp, không sử dụng các nhãn ngoài danh sách này.
 
                     YÊU CẦU:
@@ -420,19 +417,6 @@ class BloomGenerator:
             )
             citation_check_string = f"Trích từ đoạn{page_info_for_prompt}:"
 
-            # Kiểm tra nếu câu hỏi yêu cầu đánh giá nhưng đoạn văn không đủ thông tin
-            if "đánh giá" in formatted_question.lower() and (
-                "ưu điểm" not in source_segment_text.lower()
-                or "hạn chế" not in source_segment_text.lower()
-            ):
-                print(
-                    f"Skipping answer generation for question '{formatted_question}' due to insufficient information for full evaluation (missing advantages or disadvantages)."
-                )
-                results[formatted_question] = (
-                    "Đoạn văn không cung cấp đủ thông tin về cả ưu điểm và hạn chế để đánh giá theo yêu cầu của câu hỏi."
-                )
-                continue
-
             prompt = (
                 f"Dựa trên đoạn văn sau{page_info_for_prompt}:\n\n{source_segment_text}\n\n"
                 f"Hãy trả lời câu hỏi: {formatted_question}\n\n"
@@ -442,7 +426,6 @@ class BloomGenerator:
                 "3. Không được trích toàn bộ đoạn hoặc dùng dấu ba chấm (...).\n"
                 f"4. {citation_format_rule}\n"
                 "5. Đảm bảo có trích dẫn đúng định dạng.\n"
-                "6. Nếu câu hỏi yêu cầu đánh giá (ví dụ, đánh giá hiệu quả), trả lời phải bao gồm nhận định về ưu điểm và hạn chế dựa trên đoạn văn. Nếu đoạn văn không đủ thông tin cho cả hai, nêu rõ rằng không thể đánh giá đầy đủ."
             )
 
             print("\n" + "~" * 50)
@@ -480,4 +463,79 @@ class BloomGenerator:
 
             results[formatted_question] = answer.strip()
 
+        return results
+
+    def generate_qas_until_valid(
+        self,
+        level: int,
+        segments: List[Tuple[str, str, str, Any]],
+        num_questions: int,
+        level_name: str,
+        start_index: int = 1,
+    ) -> Dict[str, str]:
+        """
+        Sinh đến khi đủ num_questions QA hợp lệ, xen kẽ câu hỏi và trả lời cho mỗi câu hỏi.
+        Nếu một câu hỏi không có đáp án thỏa đáng, bỏ và thử với từ khóa tiếp theo.
+        """
+        # Lấy list từ khóa cho cấp độ
+        primary_keywords = BLOOM_KEYWORDS.get(level, "")
+        keyword_list = [kw.strip() for kw in primary_keywords.split(",") if kw.strip()]
+        if not keyword_list:
+            keyword_list = [""]
+
+        results: Dict[str, str] = {}
+        current_index = start_index
+        keyword_idx = 0
+        max_attempts = num_questions * len(keyword_list) * 3
+        attempts = 0
+
+        while len(results) < num_questions and attempts < max_attempts:
+            current_keyword = keyword_list[keyword_idx]
+            # 1) Sinh một câu hỏi mới với từ khóa hiện tại
+            qas = self.generate_questions_for_level(
+                level,
+                segments,
+                1,
+                level_name,
+                current_keyword,
+                current_index,
+            )
+            attempts += 1
+            if not qas:
+                # không sinh được câu hỏi, chuyển từ khóa
+                keyword_idx = (keyword_idx + 1) % len(keyword_list)
+                continue
+
+            question, src_text, page = qas[0]
+            # 2) Sinh đáp án ngay cho câu hỏi
+            answer = self.generate_answers_for_pairs([(question, src_text, page)]).get(
+                question, ""
+            )
+            # 3) Kiểm tra tính hợp lệ
+            invalid_phrases = [
+                "Không thể trả lời",
+                "Không tìm thấy nguồn thông tin",
+                "Không có trích dẫn phù hợp",
+                "Đoạn văn không cung cấp",
+            ]
+            has_citation = "Trích từ đoạn" in answer
+            has_invalid = any(phrase in answer for phrase in invalid_phrases)
+
+            if has_citation and not has_invalid:
+                # hợp lệ: lưu kết quả
+                results[question] = answer.strip()
+                current_index += 1
+                # reset từ khóa về đầu
+                keyword_idx = 0
+            else:
+                # không hợp lệ: bỏ câu hỏi, chuyển sang từ khóa kế
+                print(f"-> Bỏ QA do không thỏa đáng: {question}")
+                keyword_idx = (keyword_idx + 1) % len(keyword_list)
+                # không tăng current_index để giữ số thứ tự liền mạch
+            # tiếp tục vòng lặp
+
+        if len(results) < num_questions:
+            print(
+                f"[WARN] Không thể tạo đủ {num_questions} QA sau {attempts} lần thử. Chỉ có {len(results)} QA hợp lệ."
+            )
         return results
