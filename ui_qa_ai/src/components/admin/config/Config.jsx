@@ -16,7 +16,7 @@ const Config = () => {
   const [mapUrl, setMapUrl] = useState("");
 
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000/config";
+    `${process.env.REACT_APP_API_URL}/config`;
   const fetchConfig = useCallback(async () => {
     try {
       const { data } = await axios.get(`${API_BASE_URL}/getAll/`, {
