@@ -8,7 +8,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Cập nhật danh sách các gói và cài đặt các gói cần thiết
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip git nano htop && \
+    apt-get install -y \
+    python3 \
+    python3-pip \
+    git \
+    nano \
+    htop \
+    libreoffice && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

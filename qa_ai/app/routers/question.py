@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from uuid import uuid4
 from pathlib import Path
 import io
+import sys
 import zipfile
 import logging
 import pymysql
@@ -26,17 +27,17 @@ from chatbot.utils.db_utils import (
     insert_question_history,
 )
 from chatbot.services.question_processing_service import generate_qa_content
-from chatbot.services.bloom_generator import BloomGenerator
+from app.utils.convert_docx_2_pdf import convert_docx_to_pdf
 
-
-from docx2pdf import convert
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
-TXT_DIR = Path("txt")
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-TXT_DIR.mkdir(exist_ok=True)
+BASE_DIR = Path(__file__).resolve().parent.parent
+UPLOAD_DIR = BASE_DIR / "uploads"
+TXT_DIR = BASE_DIR / "txt"
+
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+TXT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @router.get("/download/zip/{file_id}", response_class=StreamingResponse)
@@ -44,7 +45,6 @@ def download_zip(file_id: str):
     """
     Tải file ZIP chứa cả 2 DOCX và 2 PDF.
     """
-    from pathlib import Path
 
     formatted_docx_file = TXT_DIR / f"{file_id}_formatted.docx"
     simple_docx_file = TXT_DIR / f"{file_id}_simple.docx"
@@ -93,7 +93,7 @@ async def generate_questions(
     level_6: int = Form(..., ge=0),
     api_key: str = get_api_key,
     db: pymysql.connections.Connection = Depends(get_db),
-    # current_user_id: int = Depends(get_current_user_id),
+    current_user_id: int = Depends(get_current_user_id),
 ):
     try:
         file_extension = file.filename.split(".")[-1].lower()
@@ -145,7 +145,7 @@ async def generate_questions(
                 detail=f"Số đoạn văn ({len(segments)}) không đủ để tạo số cấp độ khác nhau.",
             )
 
-        # deduct_token_and_log_transaction(db, current_user_id, cost=10)
+        deduct_token_and_log_transaction(db, current_user_id, cost=10)
 
         # sinh QA dùng đúng provider + model_variant
         qa_result = generate_qa_content(segments, request, provider, model_variant)
@@ -161,10 +161,17 @@ async def generate_questions(
         create_simple_docx_file(
             qa_result, simple_docx_path, exam_subject, exam_duration
         )
-        convert(str(formatted_docx_path), str(formatted_pdf_path))
-        convert(str(simple_docx_path), str(simple_pdf_path))
 
-        # insert_question_history(db, current_user_id, num_questions)
+        if not convert_docx_to_pdf(str(formatted_docx_path), str(formatted_pdf_path)):
+            raise HTTPException(
+                status_code=500, detail="Failed to convert formatted docx to pdf"
+            )
+        if not convert_docx_to_pdf(str(simple_docx_path), str(simple_pdf_path)):
+            raise HTTPException(
+                status_code=500, detail="Failed to convert simple docx to pdf"
+            )
+
+        insert_question_history(db, current_user_id, num_questions)
 
         return FileResponseModel(
             file_id=file_id,
