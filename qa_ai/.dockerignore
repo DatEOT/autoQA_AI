@@ -1,2 +1,11 @@
-uploads/*
-txt/*
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+myproject_env/
+uploads/
+txt/
+.git/
+.vscode/
+*.log
+*.tmp

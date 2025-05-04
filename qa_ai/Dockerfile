@@ -8,14 +8,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Cập nhật danh sách các gói và cài đặt các gói cần thiết
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
-    git \
-    nano \
-    htop \
-    libreoffice && \
-    apt-get clean && \
+    libreoffice-core \
+    libreoffice-writer \
+    libreoffice-common \
+    fonts-dejavu \
+    && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 
@@ -27,7 +27,7 @@ COPY . /_app_
 
 
 # Cài đặt các gói yêu cầu
-RUN pip3 install --no-cache-dir --upgrade -r /_app_/requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
 
 
 # Xóa thư mục .venv nếu có
