@@ -9,7 +9,7 @@ function HomeHeader() {
   useEffect(() => {
     const fetchLogo = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/config'}/website/1`, {
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/config/website/1`, {
           headers: {
             "API-Key": process.env.REACT_APP_API_KEY
           }
