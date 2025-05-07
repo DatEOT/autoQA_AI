@@ -310,51 +310,55 @@ const UserList = () => {
       width: 220,
       render: (_, record) => {
         const isAdminRecord = record.role === 'admin';
-        const disableDelete = isAdminRecord && !isSuperAdmin;
+        const disable = isAdminRecord && !isSuperAdmin;
         
         return (
           <Space size="small">
-            <Tooltip title="Edit">
+            <Tooltip title={disable ? "Can't Edit admin" : "Edit"}>
               <Button 
                 icon={<EditOutlined />} 
-                shape="circle" 
+                shape="circle"
+                disabled={disable}
                 onClick={() => handleEdit(record)} 
               />
             </Tooltip>
             
-            <Tooltip title={disableDelete ? "Can't delete admin" : "Delete"}>
+            <Tooltip title={disable ? "Can't delete admin" : "Delete"}>
               <Button
                 danger
                 icon={<DeleteOutlined />}
                 shape="circle"
-                disabled={disableDelete}
+                disabled={disable}
                 onClick={() => handleDelete(record.id)}
               />
             </Tooltip>
             
-            <Tooltip title={record.is_active ? "Deactivate" : "Activate"}>
+            <Tooltip title={disable ? "Can't change status" : (record.is_active ? "Deactivate" : "Activate")}>
               <Button
                 type={record.is_active ? "default" : "primary"}
                 icon={record.is_active ? <LockOutlined /> : <UnlockOutlined />}
                 shape="circle"
+                disabled={disable}
                 onClick={() => toggleActive(record.id, record.is_active)}
               />
             </Tooltip>
             
-            <Tooltip title="Add tokens">
+            <Tooltip title={disable ? "Can't Addtokens admin" : "Add tokens"}>
               <Button 
                 type="primary" 
                 icon={<PlusOutlined />} 
-                shape="circle" 
+                shape="circle"
+                disabled={disable} 
                 onClick={() => handleUpdateBalance(record.id, 'add')} 
               />
             </Tooltip>
             
-            <Tooltip title="Subtract tokens">
+            <Tooltip title={disable ? "Can't Subtract admin" : "Subtract tokens"}>
               <Button 
                 danger 
                 icon={<MinusOutlined />} 
-                shape="circle" 
+                shape="circle"
+                disabled={disable}
                 onClick={() => handleUpdateBalance(record.id, 'subtract')} 
               />
             </Tooltip>
