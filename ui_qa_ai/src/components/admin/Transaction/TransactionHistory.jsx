@@ -110,7 +110,6 @@ const TransactionHistory = () => {
 
   return (
     <div className="container p-4">
-      <h2 className="mb-4">Transaction History</h2>
 
       {/* Form tìm kiếm */}
       <div className="mb-4 row">

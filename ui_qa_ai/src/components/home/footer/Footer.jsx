@@ -61,7 +61,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <div className="footer-column footer-left">
+        <div className="footer-column footer-brand">
           {configData.logo ? (
             <img src={configData.logo} alt={configData.websiteName} className="footer-logo" />
           ) : (
@@ -70,62 +70,93 @@ function Footer() {
               <span className="logo-question">?</span>
             </div>
           )}
-          <div className="contact-info">
-            {configData.phoneNumber1 && (
-              <p className="footer-phone">Điện thoại 1: {configData.phoneNumber1}</p>
-            )}
-            {configData.phoneNumber2 && (
-              <p className="footer-phone">Điện thoại 2: {configData.phoneNumber2}</p>
-            )}
-            {configData.address && (
-              <p className="footer-address">Địa chỉ: {configData.address}</p>
-            )}
-          </div>
+          <p className="footer-description">
+            Your trusted partner for quality services and solutions.
+          </p>
           <div className="social-icons">
             {configData.facebook && (
-              <a href={configData.facebook} target="_blank" rel="noopener noreferrer">
+              <a href={configData.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <i className="fab fa-facebook-f"></i>
               </a>
             )}
             {configData.tiktok && (
-              <a href={configData.tiktok} target="_blank" rel="noopener noreferrer">
+              <a href={configData.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
                 <i className="fab fa-tiktok"></i>
               </a>
             )}
             {configData.zalo && (
-              <a href={configData.zalo} target="_blank" rel="noopener noreferrer" className="social-icon-text">Zalo</a>
+              <a href={configData.zalo} target="_blank" rel="noopener noreferrer" aria-label="Zalo" className="social-icon-text">
+                <i className="fas fa-comment-dots"></i>
+              </a>
             )}
           </div>
         </div>
-        <div className="footer-column footer-middle">
-          <h3 className="footer-heading">COMPANY</h3>
-          <ul className="footer-links">
+
+        <div className="footer-column footer-links">
+          <h3 className="footer-heading">Quick Links</h3>
+          <ul className="footer-nav">
             <li><a href="/">Home</a></li>
             <li><a href="/about">About Us</a></li>
-            <li><a href="/contact">Contact Us</a></li>
-            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/contact">Contact</a></li>
           </ul>
         </div>
-        <div className="footer-column footer-right">
+
+        <div className="footer-column footer-contact">
+          <h3 className="footer-heading">Contact Us</h3>
+          <div className="contact-info">
+            {configData.phoneNumber1 && (
+              <div className="contact-item">
+                <i className="fas fa-phone-alt"></i>
+                <a href={`tel:${configData.phoneNumber1}`}>{configData.phoneNumber1}</a>
+              </div>
+            )}
+            {configData.phoneNumber2 && (
+              <div className="contact-item">
+                <i className="fas fa-phone-alt"></i>
+                <a href={`tel:${configData.phoneNumber2}`}>{configData.phoneNumber2}</a>
+              </div>
+            )}
+            {configData.address && (
+              <div className="contact-item">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>{configData.address}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="footer-column footer-map">
+          <h3 className="footer-heading">Our Location</h3>
           {configData.address && mapUrl ? (
             <iframe
               className="google-map"
               src={mapUrl}
               width="100%"
-              height="300"
-              style={{ border: '2px solid white' }}
+              height="200"
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Google Map"
             ></iframe>
           ) : (
-            <p>Đang tải bản đồ hoặc địa chỉ không hợp lệ...</p>
+            <div className="map-placeholder">
+              <i className="fas fa-map-marked-alt"></i>
+              <p>Address not available</p>
+            </div>
           )}
         </div>
       </div>
+
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} QnA Application. All Rights Reserved.</p>
+        <div className="footer-container">
+          <p>&copy; {new Date().getFullYear()} {configData.websiteName || 'QnA Application'}. All rights reserved.</p>
+          <div className="footer-legal">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+          </div>
+        </div>
       </div>
     </footer>
   );

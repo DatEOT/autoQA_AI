@@ -10,7 +10,7 @@ class LLM:
     """
 
     def __init__(
-        self, temperature: float = 0.01, max_tokens: int = 4096, n_ctx: int = 4096
+        self, temperature: float = 0.3, max_tokens: int = 4096, n_ctx: int = 4096
     ) -> None:
         self.temperature = temperature
         self.max_tokens = max_tokens

@@ -31,6 +31,8 @@ class BloomGenerator:
         else:
             print(f"Embedding model '{embedding_model_name}' initialized successfully.")
 
+        self.seen_questions_text: Set[str] = set()
+
         # Prompt sinh câu hỏi với yêu cầu rõ về label và page number
         self.question_prompt = ChatPromptTemplate.from_messages(
             [
@@ -315,26 +317,28 @@ class BloomGenerator:
                             source_text,
                             source_page,
                         ) in new_qas:
-                            clean_q_for_check = re.sub(
-                                r"^Câu \(temp\):\s*", "", question_text.strip()
-                            )
-                            clean_q_for_check = self._clean_text_for_comparison(
-                                clean_markdown_bold(clean_q_for_check)
-                            )
-                            if clean_q_for_check not in seen_questions_text_revised:
-                                seen_questions_text_revised.add(clean_q_for_check)
-                                temp_formatted_question = f"Câu (temp): {question_text}"
-                                parsed_qas_cumulative_revised.append(
-                                    (
-                                        temp_formatted_question,
-                                        source_label,
-                                        source_text,
-                                        source_page,
-                                    )
+                            # ——————————— THÊM LỌC TRÙNG TẠI ĐÂY ————————————
+                            clean_q = self._clean_text_for_comparison(
+                                clean_markdown_bold(
+                                    re.sub(r"^Câu \(temp\):\s*", "", question_text)
                                 )
-                                print(
-                                    f"-> Added unique question: {question_text[:50]}..."
+                            )
+                            if clean_q in seen_questions_text_revised:
+                                print(f"Skipping duplicate question: {question_text}")
+                                continue
+                            seen_questions_text_revised.add(clean_q)
+
+                            # ————————————————————————————————————————————————
+                            temp_formatted_question = f"Câu (temp): {question_text}"
+                            parsed_qas_cumulative_revised.append(
+                                (
+                                    temp_formatted_question,
+                                    source_label,
+                                    source_text,
+                                    source_page,
                                 )
+                            )
+                            print(f"-> Added unique question: {question_text[:50]}...")
                         break
                     except Exception as e:
                         print(
@@ -360,6 +364,13 @@ class BloomGenerator:
                 print(
                     f"Không thể tạo đủ {num_questions} câu hỏi sau {max_attempts} lần thử."
                 )
+
+        unique: Dict[str, Tuple[str, str, str, Any]] = {}
+        for temp_q, src_label, src_text, src_page in parsed_qas_cumulative_revised:
+            clean = self._clean_text_for_comparison(clean_markdown_bold(temp_q))
+            if clean not in unique:
+                unique[clean] = (temp_q, src_label, src_text, src_page)
+        parsed_qas_cumulative_revised = list(unique.values())
 
         final_qas: List[Tuple[str, str, Any]] = []
         current_final_q_num = start_index
@@ -526,7 +537,7 @@ class BloomGenerator:
                 results[question] = answer.strip()
                 current_index += 1
                 # reset từ khóa về đầu
-                keyword_idx = 0
+                keyword_idx = (keyword_idx + 1) % len(keyword_list)
             else:
                 # không hợp lệ: bỏ câu hỏi, chuyển sang từ khóa kế
                 print(f"-> Bỏ QA do không thỏa đáng: {question}")

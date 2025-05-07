@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { Button,Tooltip } from 'antd';
+import { Button, Tooltip, Input, Select, Table, Space } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -11,22 +11,30 @@ import {
   UnlockOutlined,
   PlusOutlined,
   MinusOutlined,
+  SearchOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
-import 'react-toastify/dist/ReactToastify.css';
 import './UserList.css';
 
+const { Option } = Select;
+
 const UserList = () => {
-  const [searchEmail, setSearchEmail] = useState('');
+  const [state, setState] = useState({
+    searchEmail: '',
+    users: [],
+    lastLogins: {},
+    form: { email: '', password: '', role: 'user' },
+    editingId: null,
+    showCreateForm: false,
+    showEditForm: false,
+    isLoading: false
+  });
+
   const { role } = useParams();
   const currentUserEmail = localStorage.getItem('email');
-  const [users, setUsers] = useState([]);
-  const [lastLogins, setLastLogins] = useState({});
-  const [form, setForm] = useState({ email: '', password: '', role: 'user' });
-  const [editingId, setEditingId] = useState(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
+  const isSuperAdmin = currentUserEmail === 'admin@1234';
 
-  const fetchLastLogin = (userId) => {
+  const fetchLastLogin = useCallback((userId) => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/login_history/last_login/${userId}`, {
         headers: {
@@ -36,15 +44,23 @@ const UserList = () => {
       })
       .then((res) => {
         const time = new Date(res.data.last_login).toLocaleString('vi-VN');
-        setLastLogins((prev) => ({ ...prev, [userId]: time }));
+        setState(prev => ({
+          ...prev,
+          lastLogins: { ...prev.lastLogins, [userId]: time }
+        }));
       })
       .catch((err) => {
         console.error(`Failed to fetch last login for user ${userId}`, err);
-        setLastLogins((prev) => ({ ...prev, [userId]: 'N/A' }));
+        setState(prev => ({
+          ...prev,
+          lastLogins: { ...prev.lastLogins, [userId]: 'N/A' }
+        }));
       });
-  };
+  }, []);
 
   const fetchUsers = useCallback(() => {
+    setState(prev => ({ ...prev, isLoading: true }));
+    
     axios
       .get(`${process.env.REACT_APP_API_URL}/Usermanagement/getUsers`, {
         headers: {
@@ -57,68 +73,82 @@ const UserList = () => {
         if (role) {
           data = data.filter((user) => user.role === role);
         }
-        setUsers(data);
+        setState(prev => ({
+          ...prev,
+          users: data,
+          isLoading: false
+        }));
         data.forEach((user) => fetchLastLogin(user.id));
       })
-      .catch((err) => console.error('Error loading users:', err));
-  }, [role]);
+      .catch((err) => {
+        console.error('Error loading users:', err);
+        setState(prev => ({ ...prev, isLoading: false }));
+      });
+  }, [role, fetchLastLogin]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setState(prev => ({
+      ...prev,
+      form: { ...prev.form, [name]: value }
+    }));
   };
 
-  const handleSubmit = () => {
-    if (editingId) {
-      axios
-        .put(
-          `${process.env.REACT_APP_API_URL}/Usermanagement/updateUser/${editingId}?role=${form.role}`,
+  const handleRoleChange = (value) => {
+    setState(prev => ({
+      ...prev,
+      form: { ...prev.form, role: value }
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setState(prev => ({ ...prev, isLoading: true }));
+
+      if (state.editingId) {
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/Usermanagement/updateUser/${state.editingId}?role=${state.form.role}`,
           {},
-          {
-            headers: {
-              'API-Key': process.env.REACT_APP_API_KEY,
-              accept: 'application/json',
-            },
-          }
-        )
-        .then(() => {
-          toast.success('User updated successfully!');
-          setEditingId(null);
-          setForm({ email: '', password: '', role: 'user' });
-          fetchUsers();
-        })
-        .catch((err) => {
-          console.error('Error updating user:', err);
-          toast.error('Failed to update user.');
-        });
-    } else {
-      axios
-        .post(`${process.env.REACT_APP_API_URL}/Usermanagement/createUser`, form, {
-          headers: {
-            'API-Key': process.env.REACT_APP_API_KEY,
-            accept: 'application/json',
-          },
-        })
-        .then(() => {
-          toast.success('User created successfully!');
-          setForm({ email: '', password: '', role: 'user' });
-          fetchUsers();
-        })
-        .catch((err) => {
-          console.error('Error creating user:', err);
-          toast.error('Failed to create user.');
-        });
+          { headers: { 'API-Key': process.env.REACT_APP_API_KEY } }
+        );
+        toast.success('User updated successfully!');
+      } else {
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/Usermanagement/createUser`, 
+          state.form,
+          { headers: { 'API-Key': process.env.REACT_APP_API_KEY } }
+        );
+        toast.success('User created successfully!');
+      }
+
+      setState(prev => ({
+        ...prev,
+        form: { email: '', password: '', role: 'user' },
+        editingId: null,
+        showCreateForm: false,
+        showEditForm: false,
+        isLoading: false
+      }));
+      fetchUsers();
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error(`Failed to ${state.editingId ? 'update' : 'create'} user.`);
+      setState(prev => ({ ...prev, isLoading: false }));
     }
   };
 
   const handleEdit = (user) => {
-    setEditingId(user.id);
-    setForm({ email: user.email, password: '', role: user.role });
-    setShowEditForm(true);
-    setShowCreateForm(false);
+    setState(prev => ({
+      ...prev,
+      editingId: user.id,
+      form: { email: user.email, password: '', role: user.role },
+      showEditForm: true,
+      showCreateForm: false
+    }));
   };
 
   const handleDelete = (id) => {
@@ -130,15 +160,11 @@ const UserList = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
         axios
           .delete(`${process.env.REACT_APP_API_URL}/Usermanagement/delete/${id}`, {
-            headers: {
-              'API-Key': process.env.REACT_APP_API_KEY,
-              accept: 'application/json',
-            },
+            headers: { 'API-Key': process.env.REACT_APP_API_KEY }
           })
           .then(() => {
             toast.success('User deleted successfully!');
@@ -146,31 +172,31 @@ const UserList = () => {
           })
           .catch((err) => {
             toast.error('Delete failed!');
-            console.error('Lỗi xoá:', err);
+            console.error('Delete error:', err);
           });
       }
     });
   };
 
   const handleSearch = () => {
-    if (searchEmail.trim() === '') {
+    if (state.searchEmail.trim() === '') {
       fetchUsers();
     } else {
-      const encodedEmail = encodeURIComponent(searchEmail);
+      const encodedEmail = encodeURIComponent(state.searchEmail);
       axios
         .get(`${process.env.REACT_APP_API_URL}/Usermanagement/getUserByEmail/${encodedEmail}`, {
-          headers: {
-            'API-Key': process.env.REACT_APP_API_KEY,
-            accept: 'application/json',
-          },
+          headers: { 'API-Key': process.env.REACT_APP_API_KEY }
         })
         .then((res) => {
-          setUsers([res.data]);
+          setState(prev => ({
+            ...prev,
+            users: [res.data]
+          }));
           fetchLastLogin(res.data.id);
         })
         .catch(() => {
-          toast.error('Không tìm thấy email!');
-          setUsers([]);
+          toast.error('User not found!');
+          setState(prev => ({ ...prev, users: [] }));
         });
     }
   };
@@ -180,39 +206,23 @@ const UserList = () => {
       .put(
         `${process.env.REACT_APP_API_URL}/Usermanagement/setActive/${id}?is_active=${!currentStatus}`,
         null,
-        {
-          headers: {
-            'API-Key': process.env.REACT_APP_API_KEY,
-            accept: 'application/json',
-          },
-        }
+        { headers: { 'API-Key': process.env.REACT_APP_API_KEY } }
       )
       .then(() => {
-        toast.success(`User has been ${!currentStatus ? 'unlocked' : 'locked'} successfully!`);
+        toast.success(`User ${!currentStatus ? 'activated' : 'deactivated'}!`);
         fetchUsers();
       })
-      .catch(() => {
-        toast.error('Failed to update user status!');
-      });
+      .catch(() => toast.error('Failed to update status!'));
   };
 
   const handleUpdateBalance = (id, action) => {
     Swal.fire({
-      title: `${action === 'add' ? 'Cộng' : 'Trừ'} tiền cho user`,
+      title: `${action === 'add' ? 'Add' : 'Subtract'} tokens`,
       input: 'number',
-      inputLabel: 'Nhập số tiền',
-      inputAttributes: {
-        min: 0.01,
-        step: 0.01,
-      },
-      inputValidator: (value) => {
-        if (!value || isNaN(value)) {
-          return 'Vui lòng nhập số hợp lệ';
-        }
-      },
+      inputLabel: 'Amount',
+      inputAttributes: { min: 0.01, step: 0.01 },
+      inputValidator: (value) => !value || isNaN(value) ? 'Please enter a valid number' : null,
       showCancelButton: true,
-      confirmButtonText: 'Xác nhận',
-      cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
         const amount = parseFloat(result.value);
@@ -222,155 +232,229 @@ const UserList = () => {
           .put(
             `${process.env.REACT_APP_API_URL}/Usermanagement/updateBalance/${id}?amount=${finalAmount}`,
             null,
-            {
-              headers: {
-                'API-Key': process.env.REACT_APP_API_KEY,
-                accept: 'application/json',
-              },
-            }
+            { headers: { 'API-Key': process.env.REACT_APP_API_KEY } }
           )
           .then(() => {
-            toast.success(`${action === 'add' ? 'Cộng' : 'Trừ'} tiền thành công!`);
+            toast.success(`Balance ${action === 'add' ? 'added' : 'subtracted'}!`);
             fetchUsers();
           })
           .catch((err) => {
-            toast.error('Lỗi cập nhật số dư');
+            toast.error('Balance update failed');
             console.error('Balance error:', err);
           });
       }
     });
   };
-  
+
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 80,
+      sorter: (a, b) => a.id - b.id,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      ellipsis: true,
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      width: 100,
+      filters: [
+        { text: 'User', value: 'user' },
+        { text: 'Admin', value: 'admin' },
+      ],
+      onFilter: (value, record) => record.role === value,
+      render: (role) => (
+        <span className={`role-badge ${role}`}>
+          {role.toUpperCase()}
+        </span>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'is_active',
+      key: 'is_active',
+      width: 100,
+      render: (is_active) => (
+        <span className={`status-badge ${is_active ? 'active' : 'inactive'}`}>
+          {is_active ? 'ACTIVE' : 'INACTIVE'}
+        </span>
+      ),
+    },
+    {
+      title: 'Balance',
+      dataIndex: 'balance',
+      key: 'balance',
+      width: 120,
+      render: (balance) => (
+        <span className="balance-value">
+          {balance} <span className="token-icon">🪙</span>
+        </span>
+      ),
+    },
+    {
+      title: 'Last Login',
+      key: 'last_login',
+      width: 180,
+      render: (_, record) => state.lastLogins[record.id] || 'Loading...',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 220,
+      render: (_, record) => {
+        const isAdminRecord = record.role === 'admin';
+        const disableDelete = isAdminRecord && !isSuperAdmin;
+        
+        return (
+          <Space size="small">
+            <Tooltip title="Edit">
+              <Button 
+                icon={<EditOutlined />} 
+                shape="circle" 
+                onClick={() => handleEdit(record)} 
+              />
+            </Tooltip>
+            
+            <Tooltip title={disableDelete ? "Can't delete admin" : "Delete"}>
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                shape="circle"
+                disabled={disableDelete}
+                onClick={() => handleDelete(record.id)}
+              />
+            </Tooltip>
+            
+            <Tooltip title={record.is_active ? "Deactivate" : "Activate"}>
+              <Button
+                type={record.is_active ? "default" : "primary"}
+                icon={record.is_active ? <LockOutlined /> : <UnlockOutlined />}
+                shape="circle"
+                onClick={() => toggleActive(record.id, record.is_active)}
+              />
+            </Tooltip>
+            
+            <Tooltip title="Add tokens">
+              <Button 
+                type="primary" 
+                icon={<PlusOutlined />} 
+                shape="circle" 
+                onClick={() => handleUpdateBalance(record.id, 'add')} 
+              />
+            </Tooltip>
+            
+            <Tooltip title="Subtract tokens">
+              <Button 
+                danger 
+                icon={<MinusOutlined />} 
+                shape="circle" 
+                onClick={() => handleUpdateBalance(record.id, 'subtract')} 
+              />
+            </Tooltip>
+          </Space>
+        );
+      },
+    },
+  ];
 
   return (
-    <div className="user-list">
-      <h2>User Management</h2>
-
-      <div className="form-section">
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search by email..."
-            value={searchEmail}
+    <div className="user-management-container">
+      <div className="user-management-header">      
+        <div className="user-management-actions">
+          <Input.Search
+            placeholder="Search by email"
+            value={state.searchEmail}
             onChange={(e) => {
-              setSearchEmail(e.target.value);
-              // Nếu ô tìm kiếm trở nên rỗng, tự động reset bảng để hiển thị tất cả user
-              if (e.target.value.trim() === '') {
-                fetchUsers();
-              }
+              setState(prev => ({ ...prev, searchEmail: e.target.value }));
+              if (e.target.value.trim() === '') fetchUsers();
             }}
-            className="form-control d-inline-block w-auto mr-2"
+            onSearch={handleSearch}
+            enterButton={<SearchOutlined />}
+            style={{ width: 300 }}
           />
-          <button onClick={handleSearch} >Search</button>
+          
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={() => {
+              setState(prev => ({
+                ...prev,
+                showCreateForm: !prev.showCreateForm,
+                showEditForm: false,
+                editingId: null,
+                form: { email: '', password: '', role: 'user' }
+              }));
+            }}
+          >
+            {state.showCreateForm ? 'Cancel' : 'Create User'}
+          </Button>
         </div>
-
-        <button
-          onClick={() => {
-            if (showEditForm) {
-              setShowEditForm(false);
-              setEditingId(null);
-            } else {
-              setShowCreateForm(!showCreateForm);
-            }
-            setForm({ email: '', password: '', role: 'user' });
-          }}
-          className="create-user-btn"
-        >
-          {showEditForm ? 'Close Edit' : showCreateForm ? 'Close Create Form' : 'CreateUser'}
-        </button>
-
-        {showCreateForm && (
-          <>
-            <input
-              type="text"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-            />
-            <button onClick={handleSubmit}>Create</button>
-          </>
-        )}
-
-        {showEditForm && (
-          <>
-            <input
-              type="text"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              disabled
-            />
-            <select name="role" value={form.role} onChange={handleChange}>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-            <button onClick={handleSubmit}>Update</button>
-          </>
-        )}
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Active</th>
-            <th>Balance</th>
-            <th>Last Login</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-        {users.map((user) => {
-            const isAdminRecord = user.role === 'admin';
-            const isSuperAdmin = currentUserEmail === 'admin@1234';
-            const disableDelete = isAdminRecord && !isSuperAdmin;
+      {(state.showCreateForm || state.showEditForm) && (
+        <div className="user-form-container">
+          <div className="user-form">
+            <Input
+              placeholder="Email"
+              name="email"
+              value={state.form.email}
+              onChange={handleChange}
+              disabled={state.showEditForm}
+              style={{ marginBottom: 12 }}
+            />
+            
+            {state.showCreateForm && (
+              <Input.Password
+                placeholder="Password"
+                name="password"
+                value={state.form.password}
+                onChange={handleChange}
+                style={{ marginBottom: 12 }}
+              />
+            )}
+            
+            <Select
+              value={state.form.role}
+              onChange={handleRoleChange}
+              style={{ width: '100%', marginBottom: 12 }}
+            >
+              <Option value="user">User</Option>
+              <Option value="admin">Admin</Option>
+            </Select>
+            
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              loading={state.isLoading}
+              block
+            >
+              {state.showEditForm ? 'Update User' : 'Create User'}
+            </Button>
+          </div>
+        </div>
+      )}
 
-            return (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td>{user.is_active ? '✅' : '❌'}</td>
-                <td>{user.balance} 🪙</td>
-                <td>{lastLogins[user.id] || 'Loading...'}</td>
-                <td>
-                  <Button type="default" icon={<EditOutlined />} shape="circle" onClick={() => handleEdit(user)} />
-                  <Tooltip title={disableDelete ? 'Không thể xóa admin' : 'Xóa user'}>
-                    <Button
-                      danger
-                      type="default"
-                      icon={<DeleteOutlined />}
-                      shape="circle"
-                      disabled={disableDelete}
-                      onClick={() => handleDelete(user.id)}
-                    />
-                  </Tooltip>
-                  <Button
-                    type="primary"
-                    ghost
-                    icon={user.is_active ? <LockOutlined /> : <UnlockOutlined />}
-                    shape="circle"
-                    onClick={() => toggleActive(user.id, user.is_active)}
-                  />
-                  <Button type="primary" icon={<PlusOutlined />} shape="circle" onClick={() => handleUpdateBalance(user.id, 'add')} />
-                  <Button type="primary" danger icon={<MinusOutlined />} shape="circle" onClick={() => handleUpdateBalance(user.id, 'subtract')} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="user-table-container">
+        <Table
+          columns={columns}
+          dataSource={state.users}
+          rowKey="id"
+          loading={state.isLoading}
+          scroll={{ x: true }}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100']
+          }}
+        />
+      </div>
     </div>
   );
 };

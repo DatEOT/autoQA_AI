@@ -69,23 +69,21 @@ def generate_qa_content(
             for (label, text, page) in level_segments
         ]
 
-        qas_generated_for_level = bloom_gen.generate_questions_for_level(
-            level,
-            segments_with_keywords,
-            num_questions_requested_for_level,
-            level_name,
-            bloom_keywords,
+        qas_dict = bloom_gen.generate_qas_until_valid(
+            level=level,
+            segments=segments_with_keywords,
+            num_questions=num_questions_requested_for_level,
+            level_name=level_name,
             start_index=global_question_index,
         )
 
-        global_question_index += len(qas_generated_for_level)
-
-        answers = bloom_gen.generate_answers_for_pairs(qas_generated_for_level)
+        # Cập nhật số thứ tự câu hỏi toàn cục
+        global_question_index += len(qas_dict)
 
         qa_results.append(
             {
                 "level": f"Cấp độ {level} - {level_name}",
-                "questions": answers,
+                "questions": qas_dict,
             }
         )
 

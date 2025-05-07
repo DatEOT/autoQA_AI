@@ -1,0 +1,104 @@
+.api-key-manager-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .api-key-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+  }
+  
+  .api-key-tabs .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+  
+  .api-key-tabs .ant-tabs-tab {
+    padding: 12px 16px;
+    font-weight: 500;
+  }
+  
+  .api-key-tabs .ant-tabs-tab-active {
+    background-color: #f0f7ff;
+  }
+  
+  .provider-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .count-tag {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    font-size: 12px;
+  }
+  
+  .api-key-table {
+    margin-top: 16px;
+  }
+  
+  .api-key-table .ant-table-thead > tr > th {
+    background-color: #fafafa;
+    font-weight: 600;
+  }
+  
+  .action-btn {
+    border: none;
+    box-shadow: none;
+  }
+  
+  .view-btn {
+    color: #1890ff;
+  }
+  
+  .view-btn:hover {
+    background-color: #e6f7ff;
+  }
+  
+  .rotate-btn {
+    color: #fa8c16;
+  }
+  
+  .rotate-btn:hover {
+    background-color: #fff7e6;
+  }
+  
+  .text-muted {
+    color: #bfbfbf;
+    font-style: italic;
+  }
+  
+  .swal-wide {
+    width: 600px !important;
+  }
+  
+  .api-key-display {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+    word-break: break-all;
+    font-family: monospace;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .api-key-manager-container {
+      padding: 10px;
+    }
+    
+    .api-key-tabs .ant-tabs-tab {
+      padding: 8px 12px;
+    }
+    
+    .swal-wide {
+      width: 90% !important;
+    }
+  }

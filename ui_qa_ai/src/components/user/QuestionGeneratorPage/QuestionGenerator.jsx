@@ -5,6 +5,7 @@ import './QuestionGenerator.css';
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import ApiKeySelector from './ApiKeySelector';
+
 const BloomLevels = ({ totalQuestions, onSumChange }) => {
   const [levels, setLevels] = useState({
     level_1: 0,
@@ -23,30 +24,32 @@ const BloomLevels = ({ totalQuestions, onSumChange }) => {
   const handleChange = (level, value) => {
     setLevels(prev => ({
       ...prev,
-      [level]: Math.max(0, Number(value) || 0),
+      [level]: Math.max(0, Math.min(totalQuestions, Number(value) || 0)),
     }));
   };
 
   const labels = [
-    { key: 'level_1', text: 'Cấp độ 1 (Nhớ)' },
-    { key: 'level_2', text: 'Cấp độ 2 (Hiểu)' },
-    { key: 'level_3', text: 'Cấp độ 3 (Áp dụng)' },
-    { key: 'level_4', text: 'Cấp độ 4 (Phân tích)' },
-    { key: 'level_5', text: 'Cấp độ 5 (Đánh giá)' },
-    { key: 'level_6', text: 'Cấp độ 6 (Sáng tạo)' },
+    { key: 'level_1', text: 'Cấp độ 1 (Nhớ)', color: '#3498db' },
+    { key: 'level_2', text: 'Cấp độ 2 (Hiểu)', color: '#2ecc71' },
+    { key: 'level_3', text: 'Cấp độ 3 (Áp dụng)', color: '#f39c12' },
+    { key: 'level_4', text: 'Cấp độ 4 (Phân tích)', color: '#e74c3c' },
+    { key: 'level_5', text: 'Cấp độ 5 (Đánh giá)', color: '#9b59b6' },
+    { key: 'level_6', text: 'Cấp độ 6 (Sáng tạo)', color: '#1abc9c' },
   ];
 
   return (
-    <div className="bloom-levels">
+    <div className="bloom-levels-container">
       <div className="bloom-grid">
-        {labels.map(({ key, text }) => (
-          <div className="bloom-item" key={key}>
+        {labels.map(({ key, text, color }) => (
+          <div className="bloom-card" key={key} style={{ borderTop: `4px solid ${color}` }}>
             <label>{text}</label>
             <input
               type="number"
               value={levels[key]}
               onChange={(e) => handleChange(key, e.target.value)}
               min="0"
+              max={totalQuestions}
+              className="bloom-input"
             />
           </div>
         ))}
@@ -55,58 +58,61 @@ const BloomLevels = ({ totalQuestions, onSumChange }) => {
   );
 };
 
-const GenerateButton = ({ onClick, loading }) => {
+const GenerateButton = ({ onClick, loading, disabled }) => {
   return (
-    <button className="generate-main-btn" onClick={onClick} disabled={loading}>
+    <button 
+      className={`generate-btn ${loading ? 'loading' : ''}`} 
+      onClick={onClick} 
+      disabled={loading || disabled}
+    >
       {loading ? (
         <>
-          <i className="fas fa-spinner fa-spin" /> Đang tạo...
+          <span className="spinner"></span>
+          Đang tạo...
         </>
       ) : (
         <>
-          <i className="fas fa-question-circle" /> Tạo Câu Hỏi
+          Tạo Câu Hỏi
         </>
       )}
     </button>
   );
 };
 
-// Component DownloadSection: hiển thị thông tin file và các nút tải file Word về
 const DownloadSection = ({ results }) => {
-  if (!results) {
-    return (
-      <div className="result-section">
-        <h2>Tải xuống File Word</h2>
-        <p>Chưa có dữ liệu.</p>
-      </div>
-    );
-  }
+  if (!results) return null;
 
   const zipUrl = `${process.env.REACT_APP_API_URL}/questions/download/zip/${results.file_id}`;
   return (
-    <div className="result-section">
+    <div className="download-section">
       <h2>Tải xuống File Word (ZIP)</h2>
-      <p>
-        <strong>File ID:</strong> {results.file_id}
-      </p>
-      <p>
-        <strong>Tên file gốc:</strong> {results.original_filename}
-      </p>
-      <p>
-        <strong>Số đoạn:</strong> {results.num_segments}
-      </p>
-      <div className="download-buttons">
-      <Button
-        type="primary"
-        shape="round"
-        icon={<DownloadOutlined />}
-        size="large"
-        href={zipUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Tải file ZIP
-      </Button>
+      <div className="file-info">
+        <div className="info-item">
+          <span className="label">File ID:</span>
+          <span className="value">{results.file_id}</span>
+        </div>
+        <div className="info-item">
+          <span className="label">Tên file:</span>
+          <span className="value">{results.original_filename}</span>
+        </div>
+        <div className="info-item">
+          <span className="label">Số đoạn:</span>
+          <span className="value">{results.num_segments}</span>
+        </div>
+      </div>
+      <div className="download-btn-container">
+        <Button
+          type="primary"
+          shape="round"
+          icon={<DownloadOutlined />}
+          size="large"
+          href={zipUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="download-btn"
+        >
+          Tải file ZIP
+        </Button>
       </div>
     </div>
   );
@@ -114,14 +120,14 @@ const DownloadSection = ({ results }) => {
 
 const TotalQuestions = ({ totalQuestions, setTotalQuestions }) => {
   return (
-    <div className="total-questions">
-      <label htmlFor="totalQuestions">Tổng số câu hỏi:</label>
+    <div className="total-questions-container">
+      <label>Tổng số câu hỏi:</label>
       <input
         type="number"
-        id="totalQuestions"
-        min="0"
         value={totalQuestions}
-        onChange={(e) => setTotalQuestions(parseInt(e.target.value, 10) || 0)}
+        onChange={(e) => setTotalQuestions(Math.max(0, parseInt(e.target.value, 10) || 0))}
+        min="0"
+        className="total-input"
       />
     </div>
   );
@@ -131,62 +137,57 @@ const UploadSection = ({ onFileSelect }) => {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleSelectFile = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
+  const handleSelectFile = () => fileInputRef.current.click();
+  const handleFileChange = (e) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
       setSelectedFile(file);
       onFileSelect(file);
     }
   };
 
   return (
-    <div className="upload-section">
-      <button onClick={handleSelectFile}>
-        <i className="fas fa-upload" style={{ marginRight: '8px' }}></i>
+    <div className="upload-container">
+      <button className="file-select-btn" onClick={handleSelectFile}>
+        <span className="upload-icon">↑</span>
         Chọn File
       </button>
-      {selectedFile && (
-        <p className="selected-file">
-          <i className="fas fa-file-alt" style={{ marginRight: '8px', color: '#3498db' }}></i>
-          {selectedFile.name}
-        </p>
-      )}
       <input
         type="file"
-        id="docxFile"
         accept=".docx,.pdf,.txt"
-        style={{ display: 'none' }}
         ref={fileInputRef}
         onChange={handleFileChange}
+        hidden
       />
+      {selectedFile && (
+        <div className="file-preview">
+          <span className="file-icon">📄</span>
+          <span className="file-name">{selectedFile.name}</span>
+        </div>
+      )}
     </div>
   );
 };
 
-// Component nhập thông tin môn thi và thời gian thi
 const ExamDetails = ({ examSubject, setExamSubject, examDuration, setExamDuration }) => {
   return (
-    <div className="exam-details">
-      <div className="exam-input">
-        <label htmlFor="examSubject">Tên Môn Thi:</label>
+    <div className="exam-details-container">
+      <div className="exam-input-group">
+        <label>Tên Môn Thi:</label>
         <input
           type="text"
-          id="examSubject"
           value={examSubject}
           onChange={(e) => setExamSubject(e.target.value)}
+          placeholder="Nhập tên môn học"
         />
       </div>
-      <div className="exam-input">
-        <label htmlFor="examDuration">Thời Gian Thi:</label>
+      <div className="exam-input-group">
+        <label>Thời Gian Thi:</label>
         <input
           type="text"
-          id="examDuration"
           value={examDuration}
           onChange={(e) => setExamDuration(e.target.value)}
+          placeholder="VD: 60 phút"
         />
       </div>
     </div>
@@ -206,28 +207,24 @@ const QuestionGenerator = () => {
 
   const handleGenerateQuestions = async () => {
     if (!file) {
-      toast.error('Vui lòng chọn file trước khi tạo câu hỏi.', { position: 'top-right', autoClose: 3000 });
+      toast.error('Vui lòng chọn file trước khi tạo câu hỏi.', { position: 'top-right' });
       return;
     }
 
     if (bloomSum !== totalQuestions) {
-      toast.error(
-        `Tổng số câu hỏi Bloom (${bloomSum}) không khớp với số lượng câu hỏi yêu cầu (${totalQuestions}).`,
-        { position: 'top-right', autoClose: 3000 }
-      );
+      toast.error(`Tổng số câu hỏi Bloom (${bloomSum}) không khớp với yêu cầu (${totalQuestions}).`, { 
+        position: 'top-right' 
+      });
       return;
     }
 
     if (!examSubject || !examDuration) {
-      toast.error('Vui lòng nhập đầy đủ thông tin môn thi và thời gian thi.', { position: 'top-right', autoClose: 3000 });
+      toast.error('Vui lòng nhập đầy đủ thông tin môn thi và thời gian thi.', { position: 'top-right' });
       return;
     }
 
     if (!provider || !modelVariant) {
-      toast.error('Vui lòng chọn provider & model_variant.', {
-        position: 'top-right',
-        autoClose: 3000,
-      });
+      toast.error('Vui lòng chọn provider & model_variant.', { position: 'top-right' });
       return;
     }
 
@@ -241,80 +238,93 @@ const QuestionGenerator = () => {
     formData.append('provider', provider);
     formData.append('model_variant', modelVariant);
 
-    // Lấy giá trị các input của BloomLevels thông qua DOM
-    const bloomLevels = document.querySelectorAll('.bloom-levels input');
-    formData.append('level_1', bloomLevels[0]?.value || 0);
-    formData.append('level_2', bloomLevels[1]?.value || 0);
-    formData.append('level_3', bloomLevels[2]?.value || 0);
-    formData.append('level_4', bloomLevels[3]?.value || 0);
-    formData.append('level_5', bloomLevels[4]?.value || 0);
-    formData.append('level_6', bloomLevels[5]?.value || 0);
+    // Add Bloom levels
+    Object.keys({
+      level_1: 0, level_2: 0, level_3: 0, 
+      level_4: 0, level_5: 0, level_6: 0
+    }).forEach((key, index) => {
+      const input = document.querySelectorAll('.bloom-input')[index];
+      formData.append(key, input?.value || 0);
+    });
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/questions/generate`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'API-Key': process.env.REACT_APP_API_KEY,
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/questions/generate`, 
+        formData,
+        {
+          headers: {
+            'API-Key': process.env.REACT_APP_API_KEY,
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
 
       setResults(response.data);
-      toast.success('Tạo câu hỏi thành công!', { position: 'top-right', autoClose: 3000 });
+      toast.success('Tạo câu hỏi thành công!', { position: 'top-right' });
     } catch (err) {
-      let errorMessage =
-        err.response?.data?.detail ||
-        err.message ||
-        'Đã xảy ra lỗi khi tạo câu hỏi.';
-      const levelsNotSupported = [];
-      const levelRegex = /Cấp độ (\d+)/g;
-      let match;
-      while ((match = levelRegex.exec(errorMessage)) !== null) {
-        levelsNotSupported.push(parseInt(match[1]));
-      }
-
-      if (levelsNotSupported.length > 0) {
+      let errorMessage = err.response?.data?.detail || err.message || 'Đã xảy ra lỗi khi tạo câu hỏi.';
+      const levelsNotSupported = [...errorMessage.matchAll(/Cấp độ (\d+)/g)]
+        .map(match => parseInt(match[1]));
+      
+      if (levelsNotSupported.length) {
         errorMessage = `Không thể tạo cấp độ ${levelsNotSupported.join(', ')} do văn bản quá ít.`;
       }
 
-      toast.error(errorMessage, { position: 'top-right', autoClose: 3000 });
+      toast.error(errorMessage, { position: 'top-right' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <h1>Tạo Câu Hỏi Tự Luận từ File DOCX, PDF, TXT</h1>
-      <ApiKeySelector
-        provider={provider}
-        setProvider={setProvider}
-        modelVariant={modelVariant}
-        setModelVariant={setModelVariant}
-      />
-      
-      {/* Phần nhập thông tin môn thi và thời gian thi */}
-      <ExamDetails
-        examSubject={examSubject}
-        setExamSubject={setExamSubject}
-        examDuration={examDuration}
-        setExamDuration={setExamDuration}
-      />
+    <div className="question-generator-container">
+      <header className="generator-header">
+        <h1>Tạo Câu Hỏi Tự Luận từ File DOCX, PDF, TXT</h1>
+      </header>
 
-      <UploadSection onFileSelect={setFile} />
-      <TotalQuestions totalQuestions={totalQuestions} setTotalQuestions={setTotalQuestions} />
-      <div className="bloom-section">
-        <h3>Cấp độ Bloom</h3>
-        <BloomLevels totalQuestions={totalQuestions} onSumChange={setBloomSum} />
-        <p className="bloom-sum">
-        Tổng số câu hỏi đã chọn: {bloomSum} / {totalQuestions}
-      </p>
+      <div className="generator-content">
+        <ApiKeySelector
+          provider={provider}
+          setProvider={setProvider}
+          modelVariant={modelVariant}
+          setModelVariant={setModelVariant}
+        />
+        
+        <ExamDetails
+          examSubject={examSubject}
+          setExamSubject={setExamSubject}
+          examDuration={examDuration}
+          setExamDuration={setExamDuration}
+        />
+
+        <UploadSection onFileSelect={setFile} />
+        <TotalQuestions 
+          totalQuestions={totalQuestions} 
+          setTotalQuestions={setTotalQuestions} 
+        />
+
+        <div className="bloom-section">
+          <h3>Cấp độ Bloom</h3>
+          <BloomLevels 
+            totalQuestions={totalQuestions} 
+            onSumChange={setBloomSum} 
+          />
+          <div className="bloom-summary">
+            Tổng số câu hỏi đã chọn: <strong>{bloomSum}</strong> / {totalQuestions}
+          </div>
+        </div>
+        
+        <div className="action-section">
+          <GenerateButton 
+            onClick={handleGenerateQuestions} 
+            loading={loading}
+            disabled={bloomSum !== totalQuestions}
+          />
+        </div>
+
+        {results && <DownloadSection results={results} />}
       </div>
-      
-      <div className="generate-button">
-        <GenerateButton onClick={handleGenerateQuestions} loading={loading} />
-      </div>
-      {results && <DownloadSection results={results} />}
     </div>
   );
 };
