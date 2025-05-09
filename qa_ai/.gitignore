@@ -51,3 +51,4 @@ coverage/
 /download/*
 /docker/
 # /utils*  (nếu bạn không muốn bỏ qua utils, hãy xóa dòng này)
+*.tar
