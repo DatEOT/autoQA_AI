@@ -27,7 +27,7 @@ COPY . /_app_
 
 
 # Cài đặt các gói yêu cầu
-RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
+RUN pip3 install --no-cache-dir --upgrade --timeout 300 -r requirements.txt
 
 
 # Xóa thư mục .venv nếu có

@@ -2,47 +2,55 @@
 <html lang="en">
 
 <head>
+  <!--Mã hóa kí tự trang tiếng việt và các kí tự khác-->
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <!--Gán biểu tượng (favicon) cho tab trình duyệt.-->
+  <link rel="icon" href="%PUBLIC_URL%/images/logowebsite.png" />
+  <!--Cho phép giao diện responsive trên thiết bị di động.-->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!--Màu nền của thanh địa chỉ trên trình duyệt di động-->
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Web site created using create-react-app" />
+  <!--Mô tả về nội dung trang-->
+  <meta name="description"
+    content="Hệ thống tạo câu hỏi và trả lời tự luận tự động từ giáo trình bằng trí tuệ nhân tạo (AI), hỗ trợ giảng dạy và học tập hiệu quả." />
+  <!--Ảnh biểu tượng khi người dùng thêm web vào màn hình chính (trên iOS)-->
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-  <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+  <!--Kết nối đến file manifest.json, giúp web có thể hoạt động như ứng dụng PWA (Progressive Web App).-->
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-  <!-- public/index.html -->
+  <!--Tải Font Awesome (icon) từ CDN.-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- public/index.html -->
+  <!--Gọi Google Fonts: sử dụng font chữ Roboto với các độ đậm khác nhau.-->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <title>React App</title>
+  <!-- SEO Meta Tags -->
+  <meta name="keywords"
+    content="tự động tạo câu hỏi, câu hỏi tự luận, trả lời tự luận, trí tuệ nhân tạo, AI, giáo trình, chatbot giáo dục, sinh viên, học tập, hệ thống câu hỏi, tạo đề thi, NLP, xử lý ngôn ngữ tự nhiên, phản hồi tự động, đề tài AI" />
+  <!--Tác giả-->
+  <meta name="author" content="Nguyễn Thành Đạt (ĐạtEOT)" />
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Hệ thống tạo tự động bộ câu hỏi và trả lời tự luận từ giáo trình bằng AI" />
+  <meta property="og:description"
+    content="Ứng dụng trí tuệ nhân tạo (AI) để tự động tạo bộ câu hỏi và trả lời tự luận từ giáo trình, hỗ trợ giảng dạy và học tập hiệu quả." />
+  <!--image khi url của web đc share-->
+  <meta property="og:image" content="http://localhost:3000/images/logowebsite.png" />
+  <!--url của trang được chia sẻ-->
+  <!-- <meta property="og:url" content="https://example.com" /> -->
+  <!--loại nội dung được chia sẻ-->
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card Meta Tags -->
+  <!-- <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Tiêu đề Twitter" />
+  <meta name="twitter:description" content="Mô tả nội dung trên Twitter" />
+  <meta name="twitter:image" content="https://example.com/twitter-image.jpg" /> -->
+
+  <title>Sinh câu hỏi AI</title>
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
-  <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
 </body>
 
 </html>

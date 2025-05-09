@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sinh câu hỏi AI",
+  "name": "Hệ thống tạo câu hỏi và trả lời tự luận bằng AI từ giáo trình",
   "icons": [
     {
       "src": "favicon.ico",
